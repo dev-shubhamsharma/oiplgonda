@@ -1,23 +1,21 @@
 <?php
 
-session_start();
+    header('Content-Type: application/json');
 
+    // Check if the form was submitted
+    // if (isset($_POST['submit_enquiry'])) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
+        exit();
+    }
 
-
-
-// Array to store validation errors
-$errors = [];
-
-
-// Check if the form was submitted
-if (isset($_POST['submit_enquiry'])) {
-
-
-
+    // Array to store validation errors
+    $errors = [];
     // 2. Retrieve and Sanitize Form Data
     // Use filter_input for security and ease of use
-    $name = trim(filter_input(INPUT_POST, 'user_name', FILTER_SANITIZE_SPECIAL_CHARS));
-    $email = trim(filter_input(INPUT_POST, 'email_id', FILTER_SANITIZE_EMAIL));
+    $name = trim(filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS));
+    $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
     $mobile = trim(filter_input(INPUT_POST, 'mobile_number', FILTER_SANITIZE_NUMBER_INT));
     $message = trim(filter_input(INPUT_POST, 'message', FILTER_SANITIZE_SPECIAL_CHARS));
 
@@ -55,58 +53,53 @@ if (isset($_POST['submit_enquiry'])) {
         // NOTE: I'm assuming the column name is 'name', not 'ame' based on standard practice.
         $sql = "INSERT INTO enquiry_table (name, email_id, mobile_number, message) VALUES (?, ?, ?, ?)";
 
-        try {
-            // 2. Prepare the statement
-            $stmt = $conn->prepare($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ssss', $name, $email, $mobile, $message);
 
-            // 3. Execute the statement, passing an array of values to bind to the placeholders.
-            // PDO automatically handles the data type conversion and quoting.
-            $stmt->execute([$name, $email, $mobile, $message]);
-
-            // Success: Set flash message and redirect
-            $_SESSION['message'] = "Enquiry Submitted Successfully! We will contact you soon.";
-            $_SESSION['status'] = "success";
-            
-            // PDO does not have a separate close() method for the main connection object
-            // if using it as a variable. It closes when the script ends or by setting $conn = null;
-
-        } catch (PDOException $e) {
-            // Error handling if execution fails (e.g., bad SQL, connection issue)
-            // In a real application, you'd log $e->getMessage() and show a generic error to the user.
-            
-            $_SESSION['message'] = "Database Error: Failed to submit enquiry. Please try again later.";
-            $_SESSION['status'] = "error";
-
-            echo $e->getMessage();
+        $response = [];
+        if($stmt->execute())
+        {
+             $response = [
+                "status" => "success",
+                "message" => "Enquiry Submitted Successfully"
+            ];
+        }
+        else
+        {
+            $response = [
+                "status" => "error",
+                "message" => "Database insertion failed.",
+                "db_error" => $stmt->error // Include the specific MySQLi error message
+            ];
         }
 
-        // Redirect regardless of success or caught error
-        header("Location: index.php");
+        echo json_encode($response);
+
+        $stmt->close();
+        $conn->close();
+
         exit();
+
     } 
     else
     {
         // Save the errors and the user's input data back to the session 
         // so they can be displayed on index.php
-
-        // $status_message = "Please correct the errors below.";
-        // $status_type = "error";
-        // $_SESSION['errors'] = $errors;
-        // $_SESSION['form_data'] = $_POST;
+       
         
-        $_SESSION['message'] = "Please correct the following errors.";
-        $_SESSION['status'] = "error";
-        $_SESSION['errors'] = $errors;
+        // 2. Encode the necessary data into a JSON object and echo it
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Please correct the following errors.',
+            'errors' => $errors // Sends the array of specific error messages
+        ]);
         
-        header("Location: index.php");
+        // 3. Terminate the script
         exit();
+        
     }
-}
-else
-{
-    // If someone tries to access this script directly without submitting the form
-    header("Location: index.php");
-    exit();
-}
+
+    
+
 
 ?>

@@ -1,15 +1,15 @@
 <?php
-$servername = "sql311.infinityfree.com";
-$database ="if0_40057866_oipldb";
-$username = "if0_40057866";
-$password = "2299217High";
+$servername = "localhost";
+$database ="oipldb";
+$username = "root";
+$password = "";
 
-try {
-  $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password);
-  // set the PDO error mode to exception
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  echo "Connected successfully";
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
+// Create connection
+$conn = new mysqli($servername, $username, $password, $database);
+
+if ($conn->connect_error) {
+    // Send a proper JSON error response
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Database connection failed.', 'db_error' => $conn->connect_error]);
+    exit();
 }
-?>
