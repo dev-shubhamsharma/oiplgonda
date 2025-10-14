@@ -1,59 +1,15 @@
 
 <?php 
 
-    session_start();
-
     $current_year = date("Y");
     $page_title = "Homepage | OIPL";
 
-    $css_file = "css/main.css";
+    $main_css_file = "css/main.css";
+    $header_css_file = "css/header.css";
+
     $google_font = "https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap";
     $font_awesome_font = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css";
 ?>
-
-
-<!-- To check the enquiry submitted or not on redirection of home page -->
-
-
-<?php
-// Check if a success message exists in the session
-
-if (isset($_SESSION['message']) && $_SESSION['status'] == 'success') {
-    // Display the message using HTML/CSS (not an annoying alert)
-    echo "<script>alert('Enquiry Submitted!')</script>";
-    echo '<div style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px;">';
-    echo $_SESSION['message'];
-    echo '</div>';
-    
-    // Clear the session variables immediately after displaying
-    unset($_SESSION['message']);
-    unset($_SESSION['status']);
-}
-
-// checks if any field has incorrect value in enquiry form
-
-else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
-    // Display the message using HTML/CSS (not an annoying alert)
-    echo "<script>alert('Enquiry form error')</script>";
-    echo '<div style="padding: 15px; background-color: #e28d8aff; color: #900606ff; border: 1px solid #931609ff; margin-bottom: 20px;">';
-    echo $_SESSION['message'];
-    echo "<ul>";
-    foreach($_SESSION['errors'] as $error)
-    {
-        echo "<li>".$error."</li>";
-    }
-    echo "</ul>";
-    echo '</div>';
-    
-    // Clear the session variables immediately after displaying
-    unset($_SESSION['message']);
-    unset($_SESSION['status']);
-}
-?>
-
-
-
-
 
 
 <!DOCTYPE html>
@@ -66,6 +22,9 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
         <?php echo $page_title ?>
     </title>
 
+    <!-- Jquery Link CDN for ajax -->
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+
     <!-- font-awesome 4 icons cdn link -->
 
     <link rel="stylesheet" href="<?php echo $font_awesome_font; ?>">
@@ -73,8 +32,11 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
     <!-- google font cdn link -->
     <link href="<?php echo $google_font ?>" rel="stylesheet">
 
-    <!-- css style link -->
-    <link rel="stylesheet" href="<?php echo $css_file; ?>?v= <?php echo filemtime($css_file) ?>">
+    <!-- main.css style link -->
+    <link rel="stylesheet" href="<?php echo $main_css_file; ?>?v= <?php echo filemtime($main_css_file) ?>">
+
+    <!-- header.css style link -->
+    <link rel="stylesheet" href="<?php echo $header_css_file; ?>?v= <?php echo filemtime($header_css_file) ?>">
 
     <style>
         /************************  for courses section  ********************/
@@ -217,28 +179,10 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
 
 </head>
 <body>
-    <header>
-        <a href="index.php"><h1 id="logo">OIPL</h1></a>
-        <label for="menu-check">
-            <input type="checkbox" name="menu" id="menu-check">
-            <div class="menu-btn">
-                <div class="top line"></div>
-                <div class="middle line"></div>
-                <div class="bottom line"></div>
-            </div>
-
-            <ul id="nav">
-                <li><a href="index.php" target="" class="links">Home</a></li>
-                <li><a href="#courses" target="" class="links">Courses</a></li>
-                <!-- <li><a href="practice_tests.html" target="_self" class="links">Practice</a></li> -->
-                <!-- <li><a href="exams.html" target="" class="links">Exams</a></li> -->
-                <!-- <li><a href="acronymn.html" target="" class="links">Acronyms</a></li> -->
-                <li><a href="#contact-form" target="" class="links">Contact</a></li>
-
-            </ul>
-
-        </label>
-    </header>
+    
+    <?php
+        include "header.php";
+    ?>
 
 
 
@@ -280,7 +224,7 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
             <h3 class="course-title">Course on Computer Concept</h3>
             <p class="duration">3 Months</p>
             <p class="level">Beginner <span class="fa fa-signal"></span></p>
-            <a href="" class="more-btn">More Details</a>
+            <a href="#" class="more-btn">More Details</a>
         </div>
 
         <!-- Olevel card -->
@@ -292,7 +236,7 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
             <h3 class="course-title">NIELIT O'level Diploma</h3>
             <p class="duration">12 Months</p>
             <p class="level">Beginner <span class="fa fa-signal"></span></p>
-            <a href="" class="more-btn">More Details</a>
+            <a href="#" class="more-btn">More Details</a>
         </div>
 
         <!-- Web design card -->
@@ -304,7 +248,7 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
             <h3 class="course-title">Web Design and Development</h3>
             <p class="duration">3 Months</p>
             <p class="level">Intermediate <span class="fa fa-signal"></span></p>
-            <a href="" class="more-btn">More Details</a>
+            <a href="#" class="more-btn">More Details</a>
         </div>
 
     </section>
@@ -327,7 +271,7 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
             </div>
             <h3 class="course-title">Programming using Python</h3>
             <p class="duration">3 Months</p>
-            <p class="level">Basics and Advanced <span class="fa fa-signal"></span></p>
+            <p class="level">Advanced <span class="fa fa-signal"></span></p>
             <a href="#" class="more-btn">More Details</a>
         </div>
 
@@ -370,80 +314,25 @@ else if (isset($_SESSION['message']) && $_SESSION['status'] == 'error') {
     </section>
 
 
-
+    <?php
+    
+    include "footer.php";
+    
+    ?>
 
 
 
 
     
 
-    <!-- footer section -->
-
-    <footer>
-        <section class="left">
-            <h2><span class="fa fa-map-marker map-point"></span>Institute address</h2>
-            <address>
-                <h3>Okeanos Infotech Pvt. Ltd.</h3>
-                97, Samarpana, Near ICICI Bank,<br>
-                Civil lines, Gonda<br>
-                Uttar Pradesh<br>
-                India - 271003
-            </address>
-
-            <div class="social">
-                <span class="fa fa-facebook social-icon"></span>
-                <span class="fa fa-instagram social-icon"></span>
-                <span class="fa fa-youtube social-icon"></span>
-                <span class="fa fa-linkedin social-icon"></span>
-                <span class="fa fa-google-plus social-icon"></span>
-            </div>
-
-            <p>All rights reserved.<br>Copyright &copy; oipl- <?php  echo $current_year ?> </p>
-            <p>Designed & developed by Shubham&nbsp;Sharma</p>
-           
-        </section>
-        
-        
-        
-        <section class="right">
-            <h2>Enquiry form</h2>
-            
-
-            <form action="process_enquiry.php" autocomplete="off" id="contact-form" method="POST">
-                <div class="input-container">
-                    <label for="name"><span class="required">*</span> Name</label>
-                    <input type="text" id="name" name="user_name" placeholder="John Doe" required>
-                </div>
-                
-                <div class="input-container">
-                    <label for="email"><span class="required">*</span> Email</label>
-                    <input type="email" id="email" name="email_id" placeholder="johndoe@example.com" required>
-                </div>
-                
-                <div class="input-container">
-                    <label for="mobile_number"><span class="required">*</span> Mobile Number</label>
-                    <input type="number" id="mobile_number" name="mobile_number" placeholder="1122334455" maxlength="10" required>
-                </div>
-
-                <div class="input-container">
-                    <label for="message"><span class="required">*</span> Message</label>
-                    <textarea id="message" name="message" placeholder="Write your message here" rows="5" required></textarea>
-                </div>
-                
-                <div class="input-container">
-                    <input type="submit" name="submit_enquiry" id="send-btn" value="Send">
-                </div>
-            </form>
-        </section>
-
-
-    </footer>
 
     <div id="call-btn">
         <a href="tel:7800422341">
              <span class="fa fa-phone"></span>
         </a>
     </div>
+
+    <script src="js/enquiry_script.js"></script>
     
 </body>
 </html>
