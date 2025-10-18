@@ -14,11 +14,14 @@
 
             <ul id="nav">
                 <li><a href="index.php" target="" class="links">Home</a></li>
-                <li><a href="#courses" target="" class="links">Courses</a></li>
+                <li><a href="index.php#courses" target="" class="links">Courses</a></li>
+                <li><a href="index.php#enquiry-form" target="" class="links">Contact</a></li>
+                <li><a href="register.php" target="" class="links bordered">Register</a></li>
+                <li><a href="login.php" target="" class="links bordered">Login</a></li>
                 <!-- <li><a href="practice_tests.html" target="_self" class="links">Practice</a></li> -->
                 <!-- <li><a href="exams.html" target="" class="links">Exams</a></li> -->
                 <!-- <li><a href="acronymn.html" target="" class="links">Acronyms</a></li> -->
-                <li><a href="#contact-form" target="" class="links">Contact</a></li>
+                
 
             </ul>
 

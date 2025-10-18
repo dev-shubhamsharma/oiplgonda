@@ -69,6 +69,16 @@ header h1 {
     transition: 0.25s ease-in;
 }
 
+#nav .links.bordered {
+    border: 1px solid #fff;
+    overflow: hidden;
+}
+
+
+
+
+
+
 #nav .links:hover {
     background: #ff0099;
 
