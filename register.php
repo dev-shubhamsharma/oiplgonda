@@ -63,6 +63,14 @@
             border-radius: 3px;
         }
 
+        .input-container span {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: right;
+            display: none;
+        }
+
         #register_btn {
             /* background: linear-gradient(to right, #ff0099, #493240); */
             /* background: linear-gradient(to left, #f953c6, #b91d73); */
@@ -82,51 +90,26 @@
             overflow: hidden;
         }
 
-
-        /* preloader */
-
-
-        .preloader {
+        #register_btn::before {
+            content: '';
+            width: 100%;
+            height:100%;
+            background:#2B32B2;
             position: absolute;
-            width: 100vw;
-            height: 100vh;
+            opacity: 0.6;
             top: 0;
             left: 0;
-            /* display: flex; */
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 1.1rem;
-            line-height: 30px;
-            color: #333;
-            /* font-weight: bold; */
-            /* background: linear-gradient(to right, #0575E6, #00F260);  */
-            background: rgba(241, 239, 239, 0.9);
-            z-index: 9;
-
+            z-index: -1;
+            border-radius: 5px;
+            transition: transform 0.5s ease-out;
+            transform: translateX(120%);
+            /* border-radius: 20px; */
+            box-shadow: -10px 0px 10px rgba(226, 215, 215, 0.4);
         }
 
-        .circle {
-            width: 60px;
-            height: 60px;
-            border: 2px solid #333;
-            border-top-color:rgba(241, 239, 239, 0.9);
-            border-radius: 50%;
-            animation: animate 700ms linear infinite forwards;
+        #register_btn:hover::before {
+            transform: translateX(0%);
         }
-
-        @keyframes animate {
-            0% {transform: rotate(0deg);}
-            100% {transform: rotate(360deg);}
-        }
-
-        .preloader .text {
-            margin-top: 20px;
-        }
-
 
 
 
@@ -150,7 +133,7 @@
         }
 
 
-        #sign-in-btn {
+        #register_btn {
             padding: 10px 20px;
         }
 
@@ -177,112 +160,46 @@
 
     <main>
         <h2 class="middle-heading">Registration Form</h2>
-        <div class="form">
+        <form class="form" id="register_form">
             <div class="input-container">   
                 <label for="student_name">Student Name</label>
-                <input type="text" id="student_name" onclick="clearLoginMsg()" required>
+                <input type="text" id="student_name" required>
+                <span id="name_error">Name is Compulsory</span>
             </div>
             <div class="input-container">
                 <label for="mobile_number">Mobile Number</label>
-                <input type="number" id="mobile_number" onclick="clearLoginMsg()" required>
+                <input type="number" id="mobile_number" required>
+                <span id="mobile_number_error">Mobile number should be 10 digits</span>
             </div>
             <div class="input-container">
                 <label for="email_id">Email Id</label>
-                <input type="email" id="email_id" onclick="clearLoginMsg()" required>
+                <input type="email" id="email_id" required>
+                <span id="email_error">Email id should be valid</span>
             </div>
             <div class="input-container">
                 <label for="password">Password</label>
-                <input type="password" id="password" onclick="clearLoginMsg()" required>
+                <input type="password" id="password" required>
+                <span id="password_error">Password lenght is short</span>
             </div>
             <div class="input-container">
                 <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" onclick="clearLoginMsg()" required>
+                <input type="password" id="confirm_password" required>
+                <span id="confirm_password_error">Confirm password should be matched</span>
             </div>
             <div class="input-container">
                 <button id="register_btn">Register</button>
             </div>
-        </div>
+
+            <div id="message-box-overlay" style="display: none;" >
+                <button id="close-btn">&times;</button>
+                <ol id="message-box"></ol>
+            </div>
+
+            
+        </form>
     </main>
 
-    <div class="preloader">
-        <div class="circle"></div>
-        <p class="text">Please wait...<br> Connecting to exam server...</p>
-    </div>
-
-    <script src="js/exam_students.js"></script>
-
-    <script>
-
-        function validateUser() {
-
-            var username = document.getElementById("username").value.trim()
-            var password = document.getElementById("password").value.trim()
-
-            // to convert username into sentence case
-            const arr = username.split(" ");
-            for (var i = 0; i < arr.length; i++) {
-                arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
-            }
-
-            username = arr.join(" ");
-
-            password = password.charAt(0).toUpperCase() + password.slice(1);
-            console.log(username)
-            console.log(password)
-
-            // console.log(name)
-            // console.log(password)
-            let msg = document.querySelector("#msg")
-
-            if(password == students[username]) {
-
-                // alert("password matched")
-                // alert("matched")
-                if(window.localStorage.getItem("examstatus") != "attempted") {
-                    
-                    // console.log("not attempted value found")
-                    document.getElementsByClassName("preloader")[0].style.display = "flex"
-                    window.localStorage.setItem("username",username);
-                    window.localStorage.setItem("password",password);
-
-                    const timeout = setTimeout(function() {
-                        let url = window.location.search.toString()
-                        let i = url.indexOf("=")
-                        // console.log(url.substring(i+1))
-                        // window.localStorage.setItem("examstatus","attempted")
-                        window.open("exam_window.html?examname="+url.substring(i+1),"_self")
-                        clearTimeout(timeout)
-                    },5000)
-                }
-                else {
-                    // alert("attempted found")
-                    msg.innerHTML = "You have already attempted the Exam!"
-                    msg.style.display = "block"    
-                    document.querySelector("#x-btn").style.display = 'inline'
-                }
-                
-                
-            }
-            else {
-                // alert("not matched")
-                // alert("password not matched")s
-                msg.innerHTML = "Username or password is incorrect"
-                msg.style.display = "block"
-
-            }
-
-        }
-
-        function clearLoginMsg() {
-            document.getElementById("msg").style.display = "none"
-        }
-
-
-    </script>
-
-    <!-- <script src="students.js"></script> -->
-    
-
+    <script src="js/register_script.js"></script>
     
 </body>
 </html>
