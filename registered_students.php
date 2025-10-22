@@ -127,7 +127,7 @@
     <h2 id="heading">Registered Students</h2>
 
     <section id="button-section">
-        <input type="text" id="search-box" name="search" placeholder="Search by name or email..." onkeyup="searchStudents()">
+        <input type="text" id="search-box" name="search" placeholder="Search by name, mobile number or email..." onkeyup="searchStudents()" style="width: 400px;" >
         <div>
             <label for="filter">Filter : </label>
             <select name="filter" id="filter">
@@ -163,7 +163,7 @@
 
 
 
-    
+
 
     <script>
     $(document).ready(function() {
@@ -171,20 +171,21 @@
         // Fetch and display students
         function loadStudents() {
             $.ajax({
-                url: "fetch_students.php",
+                url: "fetch_student_data.php",
                 method: "GET",
                 dataType: "json",
                 success: function(data) {
                     let rows = "";
                     $.each(data, function(index, student) {
                         let verified = student.verification_status == 1 ? "Yes" : "No";
+                        let color = student.verification_status == 1 ? "green" : "red";
                         rows += `
                             <tr>
                                 <td>${student.student_id}</td>
                                 <td>${student.student_name}</td>
                                 <td>${student.mobile_number}</td>
                                 <td>${student.email_id}</td>
-                                <td>${verified}</td>
+                                <td style="color:${color}">${verified}</td>
                                 <td>${student.date_time}</td>
                             </tr>
                         `;
