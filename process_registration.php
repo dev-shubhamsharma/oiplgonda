@@ -15,9 +15,12 @@
     // 2. Retrieve and Sanitize Form Data
     // Use filter_input for security and ease of use
     $name = trim(filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS));
-    $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
     $mobile = trim(filter_input(INPUT_POST, 'mobile_number', FILTER_SANITIZE_NUMBER_INT));
-    $message = trim(filter_input(INPUT_POST, 'message', FILTER_SANITIZE_SPECIAL_CHARS));
+    $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
+    
+    $password = trim(filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW));
+    $confirm_password = trim(filter_input(INPUT_POST, 'confirm_password', FILTER_UNSAFE_RAW));
+
 
     // Name validation
     if (empty($name)) {
@@ -26,18 +29,19 @@
         $errors[] = "Name must contain only letters and spaces.";
     }
 
-    // Email validation
-    if (empty($email)) {
-        $errors[] = "Email is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
-    }
-
     // Mobile number validation
     if (empty($mobile)) {
         $errors[] = "Mobile Number is required.";
     } elseif (!preg_match("/^\d{10}$/", $mobile)) {
         $errors[] = "Mobile Number must be exactly 10 digits and contain only numbers.";
+    }
+    
+    
+    // Email validation
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
     }
 
     // password Validation
@@ -46,11 +50,11 @@
     }
 
     // password Validation
-    if (empty($cofirm_password)) {
+    if (empty($confirm_password)) {
         $errors[] = "Confirm Password can not be empty";
     }
 
-    if($password == $confirm_password) 
+    if($password != $confirm_password) 
     {
         $errors[] = "Both the passwords must be same";
     }
@@ -61,17 +65,20 @@
 
         // 1. Define the SQL statement with question mark (?) placeholders
         // NOTE: I'm assuming the column name is 'name', not 'ame' based on standard practice.
-        $sql = "INSERT INTO student_registration_table (name, email_id, mobile_number, message) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO student_registration_table (student_name, mobile_number, email_id, password, verification_status) VALUES (?, ?, ?, ?, ?)";
+
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        $verification_status = 0; // Assuming 0 means not verified
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('ssss', $name, $email, $mobile, $message);
+        $stmt->bind_param('ssssi', $name, $mobile, $email, $hashed_password, $verification_status);
 
         $response = [];
         if($stmt->execute())
         {
              $response = [
                 "status" => "success",
-                "message" => "Enquiry Submitted Successfully"
+                "message" => "Student Registered Successfully."
             ];
         }
         else

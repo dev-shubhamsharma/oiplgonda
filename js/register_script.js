@@ -19,8 +19,8 @@ $('#register_form').submit(function(event) {
         // data: "name="+name+"&password="+mobile,
         data : {
             name:name,
-            email:email,
             mobile_number: mobile_number,
+            email:email,
             password: password,
             confirm_password:confirm_password
         },
@@ -35,7 +35,7 @@ $('#register_form').submit(function(event) {
                 $('#message-box').removeClass('error'); 
                 $('#message-box').addClass('success');
                 $('#message-box-overlay').show();
-                $('#enquiry-form')[0].reset();
+                $('#register_form')[0].reset();
             }
             else if(response.status == 'error') {
                 $('#message-box')

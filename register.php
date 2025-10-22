@@ -25,6 +25,10 @@
 
     </title>
 
+    <!-- Jquery Link CDN for ajax -->
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+
+
     <!-- google font cdn link -->
     <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
 
@@ -163,27 +167,27 @@
         <form class="form" id="register_form">
             <div class="input-container">   
                 <label for="student_name">Student Name</label>
-                <input type="text" id="student_name" required>
+                <input type="text" id="student_name" name="student_name" required>
                 <span id="name_error">Name is Compulsory</span>
             </div>
             <div class="input-container">
                 <label for="mobile_number">Mobile Number</label>
-                <input type="number" id="mobile_number" required>
+                <input type="number" id="mobile_number" name="mobile_number" required>
                 <span id="mobile_number_error">Mobile number should be 10 digits</span>
             </div>
             <div class="input-container">
                 <label for="email_id">Email Id</label>
-                <input type="email" id="email_id" required>
+                <input type="email" id="email_id" name="email_id" required>
                 <span id="email_error">Email id should be valid</span>
             </div>
             <div class="input-container">
                 <label for="password">Password</label>
-                <input type="password" id="password" required>
+                <input type="password" id="password" name="password" required>
                 <span id="password_error">Password lenght is short</span>
             </div>
             <div class="input-container">
                 <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" required>
+                <input type="password" id="confirm_password" name="confirm_password" required>
                 <span id="confirm_password_error">Confirm password should be matched</span>
             </div>
             <div class="input-container">
