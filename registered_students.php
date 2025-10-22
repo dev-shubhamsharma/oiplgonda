@@ -149,6 +149,7 @@
                     <th>Email Id</th>
                     <th>Verified</th>
                     <th>DateTime</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="students-tbody">
@@ -179,6 +180,17 @@
                     $.each(data, function(index, student) {
                         let verified = student.verification_status == 1 ? "Yes" : "No";
                         let color = student.verification_status == 1 ? "green" : "red";
+
+                        let button = "";
+
+                        if (student.verification_status == 0) {
+                        button = `<button class="verify-btn" data-id="${student.student_id}" 
+                                    style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
+                                    Verify</button>`;
+                        } else {
+                            button = `<span style="color:gray;">Verified</span>`;
+                        }
+
                         rows += `
                             <tr>
                                 <td>${student.student_id}</td>
@@ -187,6 +199,7 @@
                                 <td>${student.email_id}</td>
                                 <td style="color:${color}">${verified}</td>
                                 <td>${student.date_time}</td>
+                                <td>${button}</td>
                             </tr>
                         `;
                     });
@@ -200,6 +213,40 @@
 
         // Initial load
         loadStudents();
+
+        // Verify button click
+        $(document).on("click", ".verify-btn", function() {
+            const studentId = $(this).data("id");
+            const button = $(this);
+
+            if (confirm("Are you sure you want to verify this student?")) {
+                $.ajax({
+                    url: "verify_students.php",
+                    method: "POST",
+                    data: { student_id: studentId },
+                    success: function(response) {
+                        if (response.trim() === "success") {
+                            alert("Student verified successfully!");
+                            loadStudents(); // Refresh table
+                        } else {
+                            alert("Error verifying student.");
+                        }
+                    },
+                    error: function() {
+                        alert("AJAX request failed.");
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
+
+
+
 
         // 🔍 Search functionality
         $("#search-box").on("keyup", function() {
