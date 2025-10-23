@@ -88,7 +88,7 @@
         }
 
         td:nth-child(5), th:nth-child(5) {
-            width: 15%;
+            width: 10%;
         }
 
         th, td {

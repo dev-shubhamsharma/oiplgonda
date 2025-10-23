@@ -69,51 +69,50 @@
         }
 
 
-        /* preloader */
 
+        
+        #login-btn {
+            /* background: linear-gradient(to right, #ff0099, #493240); */
+            /* background: linear-gradient(to left, #f953c6, #b91d73); */
+            /* background: linear-gradient(to right, #1a2980, #26d0ce); */
+            /* background: linear-gradient(to right, #aa076b, #61045f); */
+            background-image: linear-gradient(to left,#1488CC,#2B32B2);
+            padding: 15px 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 18px;
+            color: #fff;
+            border-radius: 5px;
+            border: none;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
 
-        .preloader {
+        #login-btn::before {
+            content: '';
+            width: 100%;
+            height:100%;
+            background:#2B32B2;
             position: absolute;
-            width: 100vw;
-            height: 100vh;
+            opacity: 0.6;
             top: 0;
             left: 0;
-            /* display: flex; */
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 1.1rem;
-            line-height: 30px;
-            color: #333;
-            /* font-weight: bold; */
-            /* background: linear-gradient(to right, #0575E6, #00F260);  */
-            background: rgba(241, 239, 239, 0.9);
-            z-index: 9;
-
+            z-index: -1;
+            border-radius: 5px;
+            transition: transform 0.5s ease-out;
+            transform: translateX(120%);
+            /* border-radius: 20px; */
+            box-shadow: -10px 0px 10px rgba(226, 215, 215, 0.4);
         }
 
-        .circle {
-            width: 60px;
-            height: 60px;
-            border: 2px solid #333;
-            border-top-color:rgba(241, 239, 239, 0.9);
-            border-radius: 50%;
-            animation: animate 700ms linear infinite forwards;
-        }
-
-        @keyframes animate {
-            0% {transform: rotate(0deg);}
-            100% {transform: rotate(360deg);}
-        }
-
-        .preloader .text {
-            margin-top: 20px;
+        #login-btn:hover::before {
+            transform: translateX(0%);
         }
 
 
+        
 
 
         @media(max-width:700px) {
@@ -135,7 +134,7 @@
         }
 
 
-        #sign-in-btn {
+        #login-btn {
             padding: 10px 20px;
         }
 
@@ -161,29 +160,22 @@
     ?>
 
     <main>
-        <h2 class="middle-heading">User Login</h2>
+        <h2 class="middle-heading">Student Login</h2>
         <div class="form">
             <div class="input-container">   
-                <label for="username">Username</label>
-                <input type="text" id="username" onclick="clearLoginMsg()" required>
+                <label for="email">Email Id</label>
+                <input type="text" id="email" name="email" required>
             </div>
             <div class="input-container">
                 <label for="password">Password</label>
-                <input type="password" id="password" onclick="clearLoginMsg()" required>
+                <input type="password" id="password" name="password" required>
             </div>
             <div class="input-container">
-                <button id="sign-in-btn" onclick="validateUser()">Start Exam</button>
+                <button id="login-btn">Login</button>
             </div>
             <p id="msg">User id or Password is incorrect</p>
         </div>
-        <button id="x-btn" style="display:none" onclick="window.localStorage.clear();">x</button>
     </main>
-
-    <div class="preloader">
-        <div class="circle"></div>
-        <p class="text">Please wait...<br> Connecting to exam server...</p>
-    </div>
-
     <script src="js/exam_students.js"></script>
 
     <script>
