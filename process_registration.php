@@ -18,8 +18,8 @@
     $mobile = trim(filter_input(INPUT_POST, 'mobile_number', FILTER_SANITIZE_NUMBER_INT));
     $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
     
-    $password = trim(filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW));
-    $confirm_password = trim(filter_input(INPUT_POST, 'confirm_password', FILTER_UNSAFE_RAW));
+    $password = filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
+    $confirm_password = filter_input(INPUT_POST, 'confirm_password', FILTER_UNSAFE_RAW);
 
 
     // Name validation

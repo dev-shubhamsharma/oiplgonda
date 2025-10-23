@@ -2,10 +2,10 @@
 $servername = "localhost";
 $database ="oipldb";
 $username = "root";
-$password = "";
+$db_password = "";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli($servername, $username, $db_password, $database);
 
 if ($conn->connect_error) {
     // Send a proper JSON error response

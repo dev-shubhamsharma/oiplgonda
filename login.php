@@ -25,6 +25,9 @@
 
     </title>
 
+    <!-- Jquery cdn link -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <!-- google font cdn link -->
     <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
 
@@ -62,11 +65,11 @@
             border-radius: 3px;
         }
 
-        #msg {
+        /* #msg {
             text-align: center;
             color: red;
             display: none;
-        }
+        } */
 
 
 
@@ -109,6 +112,27 @@
 
         #login-btn:hover::before {
             transform: translateX(0%);
+        }
+
+
+        #msg {
+            text-align: center;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 4px;
+            display: none; /* Initially hidden, will be shown by JS */
+        }
+        .error-msg {
+            color: #a81624ff; 
+            /* background-color: #f8d7da;  */
+            /* border: 1px solid #f5c6cb; */
+            /* display: block !important; */
+        }
+        .success-msg {
+            color: #155724 !important;
+            /* background-color: #d4edda;  */
+            /* border: 1px solid #c3e6cb; */
+            /* display: block !important; */
         }
 
 
@@ -161,7 +185,7 @@
 
     <main>
         <h2 class="middle-heading">Student Login</h2>
-        <div class="form">
+        <form class="form" id="login_form">
             <div class="input-container">   
                 <label for="email">Email Id</label>
                 <input type="text" id="email" name="email" required>
@@ -171,83 +195,95 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="input-container">
-                <button id="login-btn">Login</button>
+                <input type="submit" id="login-btn" value="Login">
             </div>
             <p id="msg">User id or Password is incorrect</p>
-        </div>
+    </form>
     </main>
-    <script src="js/exam_students.js"></script>
+
+
+
+
+
+
 
     <script>
+        $(document).ready(function() {
+            $('#login_form').submit(function(event) {
+                // Prevent the default form submission (page reload)
+                event.preventDefault();
 
-        function validateUser() {
+                // Clear previous messages and hide the element
+                $('#msg').text('').removeClass('success-msg error-msg').hide();
 
-            var username = document.getElementById("username").value.trim()
-            var password = document.getElementById("password").value.trim()
+                var email = $('#email').val(); 
+                var password = $('#password').val();
 
-            // to convert username into sentence case
-            const arr = username.split(" ");
-            for (var i = 0; i < arr.length; i++) {
-                arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
-            }
+                // Get form data
+                var formData = $(this).serialize();
+                
+                // Disable the button during AJAX call to prevent double-submission
+                $('#login-btn').prop('disabled', true).val('Logging In...');
 
-            username = arr.join(" ");
+                // AJAX POST request
+                $.ajax({
+                    type: 'POST',           // HTTP method
+                    url: 'process_login.php',   // Server-side script to handle the data
+                    // data: {
+                    //     email: email,
+                    //     password: password
+                    // },   
+                    data: formData,      // Data to be sent (email and password)
+                    dataType: 'json',       // Expecting JSON response from the server
+                    encode: true
+                })
+                .done(function(data) {
+                    // Re-enable button
+                    $('#login-btn').prop('disabled', false).val('Login');
 
-            password = password.charAt(0).toUpperCase() + password.slice(1);
-            console.log(username)
-            console.log(password)
-
-            // console.log(name)
-            // console.log(password)
-            let msg = document.querySelector("#msg")
-
-            if(password == students[username]) {
-
-                // alert("password matched")
-                // alert("matched")
-                if(window.localStorage.getItem("examstatus") != "attempted") {
+                    // Check the 'status' from the server (which is 'success' or 'error')
+                    if (data.status === 'success') {
+                        // Successful login
+                        $('#msg').addClass('success-msg').text(data.message);
+                        
+                        // Redirect if the server sent a redirect path (recommended in the PHP code)
+                        if (data.redirect) {
+                            // Use setTimeout for a small delay before redirecting
+                            setTimeout(function() {
+                                window.location.href = data.redirect;
+                            }, 500); 
+                        }
+                        
+                    } else if (data.status === 'error') {
+                        // Failed login (validation errors or authentication/verification failed)
+                        
+                        let displayMessage = data.message;
+                        
+                        // If specific field errors are sent (like validation errors)
+                        if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+                            displayMessage += " " + data.errors.join(", ");
+                        }
+                        
+                        $('#msg').addClass('error-msg').text(displayMessage);
+                    }
                     
-                    // console.log("not attempted value found")
-                    document.getElementsByClassName("preloader")[0].style.display = "flex"
-                    window.localStorage.setItem("username",username);
-                    window.localStorage.setItem("password",password);
-
-                    const timeout = setTimeout(function() {
-                        let url = window.location.search.toString()
-                        let i = url.indexOf("=")
-                        // console.log(url.substring(i+1))
-                        // window.localStorage.setItem("examstatus","attempted")
-                        window.open("exam_window.html?examname="+url.substring(i+1),"_self")
-                        clearTimeout(timeout)
-                    },5000)
-                }
-                else {
-                    // alert("attempted found")
-                    msg.innerHTML = "You have already attempted the Exam!"
-                    msg.style.display = "block"    
-                    document.querySelector("#x-btn").style.display = 'inline'
-                }
-                
-                
-            }
-            else {
-                // alert("not matched")
-                // alert("password not matched")s
-                msg.innerHTML = "Username or password is incorrect"
-                msg.style.display = "block"
-
-            }
-
-        }
-
-        function clearLoginMsg() {
-            document.getElementById("msg").style.display = "none"
-        }
-
-
-    </script>
-
-    <!-- <script src="students.js"></script> -->
+                    // Show the message element
+                    $('#msg').show();
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    // Handle network error, 404, 500 status codes, or malformed JSON response
+                    $('#msg').addClass('error-msg').text('An unknown server or network error occurred. Please try again.');
+                    // Show the message element
+                    $('#msg').show();
+                    // Re-enable button
+                    $('#login-btn').prop('disabled', false).val('Login');
+                    
+                    console.log("AJAX Error: ", textStatus, errorThrown, jqXHR.responseText);
+                });
+            });
+        });
+        </script>
+    
     
 
     
