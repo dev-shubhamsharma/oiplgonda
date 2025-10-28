@@ -279,7 +279,7 @@
 
         <div class="card">
             <div class="img-wrapper">
-                <img src="images//ccc.png" alt="course image">
+                <img src="images/iot.png" alt="course image">
             </div>
             <h3 class="course-title">Internet of Things (IoT)</h3>
             <p class="duration">3 Months</p>
@@ -291,7 +291,7 @@
 
         <div class="card">
             <div class="img-wrapper">
-                <img src="images/olevel.png" alt="course image">
+                <img src="images/dit.png" alt="course image">
             </div>
             <h3 class="course-title">Diploma in Info. Technology (DIT)</h3>
             <p class="duration">12 Months</p>

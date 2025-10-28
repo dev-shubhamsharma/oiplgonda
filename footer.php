@@ -20,7 +20,7 @@
                 <span class="fa fa-google-plus social-icon"></span>
             </div>
 
-            <p>All rights reserved.<br>Copyright &copy; oipl- <?php  echo $current_year ?> </p>
+            <p>All rights reserved.<br>Copyright &copy; Okeanos Infotech Pvt. Ltd.,Gonda (OIPL) - <?php  echo $current_year ?> </p>
             <p>Designed & developed by Shubham&nbsp;Sharma</p>
            
         </section>
