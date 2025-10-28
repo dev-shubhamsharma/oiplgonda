@@ -88,6 +88,7 @@
                         $_SESSION['user_id'] = $row['student_id'];
                         $_SESSION['user_name'] = $row['student_name'];
                         $_SESSION['logged_in'] = TRUE;
+                        $_SESSION['email_id'] = $email;
 
                         $response = [
                             "status" => "success",
