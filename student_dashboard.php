@@ -37,6 +37,9 @@ if ($_SESSION['user_email_id'] == $admin_email) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard | OIPL</title>
 
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <style>
         * {
             margin: 0;
@@ -75,6 +78,36 @@ if ($_SESSION['user_email_id'] == $admin_email) {
             font-size: 16px;
             color: white;
         }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .button-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #203f8eff;
+            border-radius: 10px;
+            width: 200px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .button-link:hover {
+            background-color: #203f8eff;
+            color: white;
+        }
+
+        .button-link i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
 
         footer {
             text-align: center;
@@ -123,6 +156,13 @@ if ($_SESSION['user_email_id'] == $admin_email) {
                 }
             ?>
         </h2>
+
+        <section class="buttons-container">
+            <a href="change_password.php" class="button-link">
+                <i class="fa fa-lock"></i>
+                <span>Change Password</span>
+            </a>
+        </section>
 
     </main>
 

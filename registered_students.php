@@ -59,14 +59,41 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
             box-sizing: border-box;
         }
 
+        .button {
+            padding: 10px 20px;
+            background-color: #203f8eff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: whitesmoke;
+            color: white;
+            color: #333;
+            
+            border-bottom: 2px solid #ccc;
+        }
+
         #heading {
-            text-align: center;
+            /* text-align: center; */
             /* margin: 10px; */
-            padding: 20px;
+            /* padding: 20px; */
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
             color: #2B32B2;
             font-size: 35px;
-            border-bottom: 2px solid #ccc;
+            /* border-bottom: 2px solid #ccc; */
         }
 
         #button-section {
@@ -155,8 +182,13 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
 
 </head>
 <body>
-    
-    <h2 id="heading">Registered Students</h2>
+
+    <header>    
+        <a href="admin_dashboard.php">
+            <button class="button">&LeftArrow; Back to Dashboard</button>
+        </a>
+        <h2 id="heading">Registered Students</h2>
+    </header>
 
     <section id="button-section">
         <input type="text" id="search-box" name="search" placeholder="Search by name, mobile number or email..." onkeyup="searchStudents()" style="width: 400px;" >
