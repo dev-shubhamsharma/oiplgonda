@@ -94,7 +94,7 @@
                         $response = [
                             "status" => "success",
                             "message" => "Login successful.",
-                            // "redirect" => "student_dashboard.php"
+                            "redirect" => "student_dashboard.php"
                         ];
                     } else {
                         // User is not verified

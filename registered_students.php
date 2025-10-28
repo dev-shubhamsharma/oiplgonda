@@ -4,6 +4,9 @@
 ?>
 
 
+<!-- To check that the user is logged in -->
+
+
 <?php
 session_start();
 

@@ -258,7 +258,7 @@
                             // Use setTimeout for a small delay before redirecting
                             setTimeout(function() {
                                 window.location.href = data.redirect;
-                            }, 500); 
+                            }, 700); 
                         }
                         
                     } else if (data.status === 'error') {
