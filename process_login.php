@@ -5,8 +5,7 @@
 
     header('Content-Type: application/json');
 
-    session_start(); // Start session early to use later
-
+   
 
     // Check if the form was submitted
     // if (isset($_POST['submit_enquiry'])) {
@@ -82,13 +81,15 @@
                 if (password_verify($password, $hashed_password)) {
                     // Password is correct
                     if($verification_status == 1) {
+                        // User is verified
+
+                         session_start(); // Start session early to use later
 
                         
-                        // User is verified
                         $_SESSION['user_id'] = $row['student_id'];
                         $_SESSION['user_name'] = $row['student_name'];
                         $_SESSION['logged_in'] = TRUE;
-                        $_SESSION['email_id'] = $email;
+                        $_SESSION['user_email_id'] = $email;
 
                         $response = [
                             "status" => "success",
