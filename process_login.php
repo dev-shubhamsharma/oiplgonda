@@ -23,7 +23,7 @@
     
     $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
 
-    var_dump($email);
+    // var_dump($email);
     
     $password = filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
 
@@ -43,6 +43,7 @@
     }
 
     // var_dump($password);
+
     
     if (empty($errors)) {
 
@@ -55,7 +56,7 @@
 
         // 1. Define the SQL statement with question mark (?) placeholders
         // NOTE: I'm assuming the column name is 'name', not 'ame' based on standard practice.
-        $sql = "SELECT student_id,student_name,password,verification_status FROM student_registration_table WHERE email_id = ?";
+        $sql = "SELECT student_id, student_name, password, verification_status FROM student_registration_table WHERE email_id = ?";
 
         
         $stmt = $conn->prepare($sql);

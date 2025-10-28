@@ -188,7 +188,7 @@
         <form class="form" id="login_form">
             <div class="input-container">   
                 <label for="email">Email Id</label>
-                <input type="text" id="email" name="email" required>
+                <input type="text" id="email" name="email" required autofocus>
             </div>
             <div class="input-container">
                 <label for="password">Password</label>
@@ -220,22 +220,29 @@
                 var password = $('#password').val();
 
                 // Get form data
-                var formData = $(this).serialize();
+                // var formData = $(this).serialize();
                 
                 // Disable the button during AJAX call to prevent double-submission
-                $('#login-btn').prop('disabled', true).val('Logging In...');
+                // $('#login-btn').prop('disabled', true).val('Logging In...');
 
                 // AJAX POST request
                 $.ajax({
                     type: 'POST',           // HTTP method
                     url: 'process_login.php',   // Server-side script to handle the data
-                    // data: {
-                    //     email: email,
-                    //     password: password
-                    // },   
-                    data: formData,      // Data to be sent (email and password)
+                    data: {
+                        email: email,
+                        password: password
+                    },   
+                    // data: formData,      // Data to be sent (email and password)
                     dataType: 'json',       // Expecting JSON response from the server
-                    encode: true
+                    encode: true,
+                    // success: function(response) {
+                    //     // let data = JSON.parse(response);
+                    //     console.log("Server Response: ", response);
+                    // },
+                    // error: function(xhr, status, error) {
+                    //     console.log("AJAX Error: ", status, error);
+                    // }
                 })
                 .done(function(data) {
                     // Re-enable button
