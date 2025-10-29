@@ -35,6 +35,9 @@ if ($_SESSION['user_email_id'] == $admin_email) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- to change the website icon in browser -->
+    <link rel="icon" href="images/logo.ico" type="image/x-icon">
+
     <title>Student Dashboard | OIPL</title>
 
     <!-- Font Awesome CDN -->
@@ -158,10 +161,28 @@ if ($_SESSION['user_email_id'] == $admin_email) {
         </h2>
 
         <section class="buttons-container">
+            
+            <a href="show_tests.php" class="button-link">
+                <i class="fa fa-book"></i>
+                <span>Mock Tests</span>
+            </a>
+
+            <a href="exam.php" class="button-link">
+                <i class="fa fa-trophy"></i>
+                <span>Attempt Exam</span>
+            </a>
+
+            <a href="show_ranking.php" class="button-link">
+                <i class="fa fa-bar-chart"></i>
+                <span>Show My Rank</span>
+            </a>
+
+
             <a href="change_password.php" class="button-link">
                 <i class="fa fa-lock"></i>
                 <span>Change Password</span>
             </a>
+
         </section>
 
     </main>

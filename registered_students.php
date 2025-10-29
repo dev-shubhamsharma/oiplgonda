@@ -41,6 +41,9 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- to change the website icon in browser -->
+    <link rel="icon" href="images/logo.ico" type="image/x-icon">
+
     <title>Registered Students | OIPL</title>
 
     <!-- google font cdn link -->
@@ -76,7 +79,7 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
 
         header {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
             padding: 20px 30px;
             background-color: whitesmoke;
@@ -159,8 +162,9 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
 
         @media screen and (max-width: 768px) {
             
+            
             #heading {
-                font-size: 30px;
+                font-size: 1.5rem;
             }
 
             .table-section {
@@ -185,9 +189,12 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
 
     <header>    
         <a href="admin_dashboard.php">
-            <button class="button">&LeftArrow; Back to Dashboard</button>
+            <button class="button">&LeftArrow; Back</button>
         </a>
-        <h2 id="heading">Registered Students</h2>
+        <h1 id="heading">Registered Students</h1>
+        <a href="logout.php">
+            <button class="button">Logout</button>
+        </a>
     </header>
 
     <section id="button-section">
