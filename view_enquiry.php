@@ -1,8 +1,40 @@
 <?php 
 
-    include "admin_only_validation.php";
-    
+    $google_font = "https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap";
 ?>
+
+
+<!-- To check that the user is logged in -->
+
+
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit();
+}
+
+// Check if this is the admin user (using email check)
+$admin_email = 'admin@oipl.com';  // <-- your real admin email
+// echo $_SESSION['user_id'];
+// echo $_SESSION['user_name'];
+// echo $_SESSION['logged_in'];
+// echo $_SESSION['user_email_id'];
+
+if ($_SESSION['user_email_id'] !== $admin_email) {
+    echo "<h2>Access Denied: You are not authorized to view this page.</h2>";
+
+    echo "Go to <a href='login.php'> Login Page</a>";
+    // header('Location: login.php');
+    exit();
+}
+?>
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,20 +44,16 @@
     <!-- to change the website icon in browser -->
     <link rel="icon" href="images/logo.ico" type="image/x-icon">
 
-    <title>Registered Students | OIPL</title>
+    <title>View Enquiries | OIPL</title>
 
-   
+    <!-- google font cdn link -->
+    <link href="<?php echo $google_font ?>" rel="stylesheet">
 
+    <?php include "libs/font-awesome.php"; ?>
+    
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <?php 
-    
-    include "libs/jquery.php"; 
-    include "libs/font-awesome.php";
-    include "libs/google-font.php";
-    
-    
-    ?>
-    
 
     <style>
 
@@ -164,7 +192,8 @@
         <a href="admin_dashboard.php">
             <button class="button">&LeftArrow; Back</button>
         </a>
-        <h1 id="heading">Registered Students</h1>
+        <h1 id="heading">View Enquiries</h1>
+
         <a href="logout.php">
             <button class="button">Logout</button>
         </a>
@@ -172,32 +201,30 @@
 
     <section id="button-section">
         <input type="text" id="search-box" name="search" placeholder="Search by name, mobile number or email..." onkeyup="searchStudents()" style="width: 400px;" >
-        <div>
+        <!-- <div>
             <label for="filter">Filter : </label>
             <select name="filter" id="filter">
                 <option value="All">All</option>
                 <option value="Verified">Verified</option>
                 <option value="Not Verified">Not Verified</option>
             </select>
-        </div>
+        </div> -->
         
     </section>
 
     <section class="table-section">
-        <table id="students-table">
+        <table id="enquiry-table">
             <thead>
                 <tr>
-                    <th>Reg.Id</th>
-                    <th>Student Name</th>
-                    <th>Mobile No</th>
+                    <th>S.No.</th>
+                    <th>Candidate Name</th>
                     <th>Email Id</th>
-                    <th>Verified</th>
-                    <th>DateTime</th>
-                    <th>Action</th>
+                    <th>Mobile No</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="students-tbody">
-                <!-- Student rows will be populated here via JavaScript -->
+            <tbody id="enquiry-tbody">
+                <!-- Enquiry rows will be populated here via JavaScript -->
             </tbody>
         </table>
 
@@ -213,37 +240,41 @@
     <script>
     $(document).ready(function() {
 
-        // Fetch and display students
-        function loadStudents() {
+        // Fetch and display enquiries
+        function loadEnquiries() {
             $.ajax({
-                url: "fetch_student_data.php",
+                url: "fetch_enquiry_data.php",
                 method: "GET",
                 dataType: "json",
                 success: function(data) {
                     let rows = "";
-                    $.each(data, function(index, student) {
-                        let verified = student.verification_status == 1 ? "Yes" : "No";
-                        let color = student.verification_status == 1 ? "green" : "red";
+                    $.each(data, function(index, enquiry) {
+                        // let verified = student.verification_status == 1 ? "Yes" : "No";
+                        // let color = student.verification_status == 1 ? "green" : "red";
 
-                        let button = "";
+                        // let button = "";
 
-                        if (student.verification_status == 0) {
-                        button = `<button class="verify-btn" data-id="${student.student_id}" 
+
+                        let viewButton = `<button class="view-btn" data-id="${student.student_id}" 
                                     style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
                                     Verify</button>`;
-                        } else {
-                            button = `<span style="color:gray;">Verified</span>`;
-                        }
+
+                        // if (student.verification_status == 0) {
+                        // button = `<button class="verify-btn" data-id="${student.student_id}" 
+                        //             style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
+                        //             Verify</button>`;
+                        // } else {
+                        //     button = `<span style="color:gray;">Verified</span>`;
+                        // }
 
                         rows += `
                             <tr>
-                                <td>${student.student_id}</td>
-                                <td>${student.student_name}</td>
-                                <td>${student.mobile_number}</td>
-                                <td>${student.email_id}</td>
-                                <td style="color:${color}">${verified}</td>
-                                <td>${student.date_time}</td>
-                                <td>${button}</td>
+                                <td>${enquiry.enquiry_id}</td>
+                                <td>${enquiry.name}</td>
+                                <td>${enquiry.email_id}</td>
+                                <td>${enquiry.mobile_number}</td>
+                                <td></td>
+                                
                             </tr>
                         `;
                     });

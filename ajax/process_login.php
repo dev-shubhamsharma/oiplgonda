@@ -1,6 +1,7 @@
 <?php
 
     //process_login.php
+    // This script processes the login form submission
 
 
     header('Content-Type: application/json');
