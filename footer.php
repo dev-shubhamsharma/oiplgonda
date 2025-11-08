@@ -31,7 +31,7 @@
             <h2>Enquiry form</h2>
             
 
-            <form action="process_enquiry.php" autocomplete="off" id="enquiry-form" method="POST">
+            <form autocomplete="off" id="enquiry-form" method="POST">
                 <div class="input-container">
                     <label for="name"><span class="required">*</span> Name</label>
                     <input type="text" id="name" name="user_name" placeholder="John Doe" required>

@@ -26,15 +26,11 @@
         <?php echo $page_title ?>
     </title>
 
-    <!-- Jquery Link CDN for ajax -->
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
-
-    <!-- font-awesome 4 icons cdn link -->
-
-    <link rel="stylesheet" href="<?php echo $font_awesome_font; ?>">
-
-    <!-- google font cdn link -->
-    <link href="<?php echo $google_font ?>" rel="stylesheet">
+    <?php 
+        include ("libs/font-awesome.php");
+        include ("libs/google-font.php");
+        include ("libs/jquery.php");
+    ?>
 
     <!-- main.css style link -->
     <link rel="stylesheet" href="<?php echo $main_css_file; ?>?v= <?php echo filemtime($main_css_file) ?>">
