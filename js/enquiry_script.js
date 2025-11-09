@@ -13,7 +13,7 @@ $('#enquiry-form').submit(function(event) {
 
     $.ajax({
         type: "POST",
-        url: "ajax/process_enquiry.php",
+        url: "process_enquiry.php",
         // data: "name="+name+"&password="+mobile,
         data : {
             name:name,

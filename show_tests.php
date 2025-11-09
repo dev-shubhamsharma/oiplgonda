@@ -52,15 +52,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
     <title>Mock Tests | OIPL</title>
 
-    <!-- google font cdn link -->
-    <link href="<?php echo $google_font ?>" rel="stylesheet">
+    <?php
 
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        include "libs/jquery.php";
+        include "libs/font-awesome.php";    
+        include "libs/google-font.php";
 
-    
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    ?>
 
 
     <style>
@@ -197,30 +195,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
     </section>
 
-    <section class="buttons-container">
-            
-        <a href="show_tests.php" class="button-link">
-            <i class="fa fa-server"></i>
-            <span>IT tools</span>
-        </a>
-
-        <a href="exam.php" class="button-link">
-            <i class="fa fa-html5"></i>
-            <span>Web Design</span>
-        </a>
-
-        <a href="show_ranking.php" class="button-link">
-            <i class="fa fa-cogs"></i>
-            <span>Python</span>
-        </a>
-
-
-        <a href="change_password.php" class="button-link">
-            <i class="fa fa-microchip"></i>
-            <span>Internet of Things</span>
-        </a>
-
-    </section>
+    
 
 
 

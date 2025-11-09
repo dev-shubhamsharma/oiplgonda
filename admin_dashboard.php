@@ -166,9 +166,14 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
                 <i class="fa fa-user"></i>
                 <span>View Registered Students</span>
             </a>
-            <a href="manage_courses.php" class="button-link">
-                <i class="fa fa-book"></i>
-                <span>Manage Courses</span>
+
+            <a href="view_enquiry.php" class="button-link">
+                <i class="fa fa-envelope"></i>
+                <span>View Enquiries</span>
+            </a>
+            <a href="manage_mock_tests.php" class="button-link">
+                <i class="fa fa-flask"></i>
+                <span>Manage Mock Tests</span>
             </a>
             <a href="site_settings.php" class="button-link">
                 <i class="fa fa-cog"></i>

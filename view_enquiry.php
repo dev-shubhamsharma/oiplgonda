@@ -1,6 +1,6 @@
 <?php
 
-include("admin_only_validation.php");
+include "admin_only_validation.php";
 
 ?>
 
@@ -16,14 +16,14 @@ include("admin_only_validation.php");
 
     <title>View Enquiries | OIPL</title>
 
-    <!-- google font cdn link -->
-    <link href="<?php echo $google_font ?>" rel="stylesheet">
+   
 
-    <?php include "libs/font-awesome.php"; ?>
+    <?php 
+        include "libs/font-awesome.php";
+        include "libs/google-font.php";
+        include "libs/jquery.php";
+    ?>
     
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
     <style>
 
@@ -105,7 +105,7 @@ include("admin_only_validation.php");
         }
 
         td:nth-child(1), th:nth-child(1) {
-            width: 12%;
+            width: 10%;
         }
 
         td:nth-child(2), th:nth-child(2) {
@@ -113,21 +113,29 @@ include("admin_only_validation.php");
         }
 
         td:nth-child(3), th:nth-child(3) {
-            width: 15%;
+            width: 20%;
         }
 
         td:nth-child(4), th:nth-child(4) {
-            width: 25%;
+            width: 20%;
         }
 
         td:nth-child(5), th:nth-child(5) {
-            width: 10%;
+            width: 20%;
         }
 
         th, td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
+        }
+
+        .view-btn:hover {
+            background-color: #203f8eff !important;
+        }
+
+        .delete-btn:hover {
+            background-color: #203f8eff !important;
         }
 
 
@@ -225,9 +233,13 @@ include("admin_only_validation.php");
                         // let button = "";
 
 
-                        let viewButton = `<button class="view-btn" data-id="${student.student_id}" 
+                        let viewButton = `<button class="view-btn fa fa-eye" data-id="${enquiry.enquiry_id}" 
                                     style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                                    Verify</button>`;
+                                    View</button>`;
+
+                        let deleteButton = `<button class="delete-btn fa fa-trash" data-id="${enquiry.enquiry_id}" 
+                                    style="background-color:red;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
+                                    Del</button>`;
 
                         // if (student.verification_status == 0) {
                         // button = `<button class="verify-btn" data-id="${student.student_id}" 
@@ -243,12 +255,12 @@ include("admin_only_validation.php");
                                 <td>${enquiry.name}</td>
                                 <td>${enquiry.email_id}</td>
                                 <td>${enquiry.mobile_number}</td>
-                                <td></td>
+                                <td>${viewButton} ${deleteButton}</td>
                                 
                             </tr>
                         `;
                     });
-                    $("#students-tbody").html(rows);
+                    $("#enquiry-tbody").html(rows);
                 },
                 error: function(xhr, status, error) {
                     console.error("Error: " + error);
@@ -257,24 +269,25 @@ include("admin_only_validation.php");
         }
 
         // Initial load
-        loadStudents();
+        loadEnquiries();
 
-        // Verify button click
-        $(document).on("click", ".verify-btn", function() {
-            const studentId = $(this).data("id");
+
+        // delete button click
+        $(document).on("click", ".delete-btn", function() {
+            const enquiryId = $(this).data("id");
             const button = $(this);
 
-            if (confirm("Are you sure you want to verify this student?")) {
+            if (confirm("Are you sure you want to delete this enquiry?")) {
                 $.ajax({
-                    url: "verify_students.php",
+                    url: "delete_enquiry.php",
                     method: "POST",
-                    data: { student_id: studentId },
+                    data: { enquiry_id: enquiryId },
                     success: function(response) {
                         if (response.trim() === "success") {
-                            alert("Student verified successfully!");
-                            loadStudents(); // Refresh table
+                            alert("Enquiry deleted successfully!");
+                            loadEnquiries(); // Refresh table
                         } else {
-                            alert("Error verifying student.");
+                            alert("Error deleting enquiry.");
                         }
                     },
                     error: function() {
@@ -288,15 +301,44 @@ include("admin_only_validation.php");
 
 
 
+        // Verify button click
+        // $(document).on("click", ".verify-btn", function() {
+        //     const studentId = $(this).data("id");
+        //     const button = $(this);
+
+        //     if (confirm("Are you sure you want to verify this student?")) {
+        //         $.ajax({
+        //             url: "verify_students.php",
+        //             method: "POST",
+        //             data: { student_id: studentId },
+        //             success: function(response) {
+        //                 if (response.trim() === "success") {
+        //                     alert("Student verified successfully!");
+        //                     loadStudents(); // Refresh table
+        //                 } else {
+        //                     alert("Error verifying student.");
+        //                 }
+        //             },
+        //             error: function() {
+        //                 alert("AJAX request failed.");
+        //             }
+        //         });
+        //     }
+        // });
 
 
 
 
 
-        // 🔍 Search functionality
+
+
+
+
+
+        //🔍 Search functionality
         $("#search-box").on("keyup", function() {
             const value = $(this).val().toLowerCase();
-            $("#students-tbody tr").filter(function() {
+            $("#enquiry-tbody tr").filter(function() {
                 $(this).toggle(
                     $(this).text().toLowerCase().indexOf(value) > -1
                 );
@@ -304,19 +346,19 @@ include("admin_only_validation.php");
         });
 
         // ✅ Filter verified / not verified
-        $("#filter").on("change", function() {
-            const filterValue = $(this).val();
-            $("#students-tbody tr").each(function() {
-                const status = $(this).find("td:nth-child(5)").text().trim();
-                if (filterValue === "All" ||
-                    (filterValue === "Verified" && status === "Yes") ||
-                    (filterValue === "Not Verified" && status === "No")) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        });
+        // $("#filter").on("change", function() {
+        //     const filterValue = $(this).val();
+        //     $("#students-tbody tr").each(function() {
+        //         const status = $(this).find("td:nth-child(5)").text().trim();
+        //         if (filterValue === "All" ||
+        //             (filterValue === "Verified" && status === "Yes") ||
+        //             (filterValue === "Not Verified" && status === "No")) {
+        //             $(this).show();
+        //         } else {
+        //             $(this).hide();
+        //         }
+        //     });
+        // });
 
     });
     </script>
