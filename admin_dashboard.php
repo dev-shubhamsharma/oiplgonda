@@ -171,9 +171,9 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
                 <i class="fa fa-envelope"></i>
                 <span>View Enquiries</span>
             </a>
-            <a href="manage_mock_tests.php" class="button-link">
-                <i class="fa fa-flask"></i>
-                <span>Manage Mock Tests</span>
+            <a href="manage_questions.php" class="button-link">
+                <i class="fa fa-question-circle"></i>
+                <span>Manage Questions</span>
             </a>
             <a href="site_settings.php" class="button-link">
                 <i class="fa fa-cog"></i>
