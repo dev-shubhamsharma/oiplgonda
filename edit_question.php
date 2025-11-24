@@ -52,6 +52,11 @@
             color: white;
         }
 
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
         a {
             text-decoration: none;
             color: inherit;
@@ -152,14 +157,14 @@
 
     <section id="button-section">
 
-        <button class="button">
+        <button class="button" id="prev-question-btn">
             <i class="fa fa-chevron-left"></i>
             &nbsp;Prev Question
         </button>
 
         <div>
             <label for="question_id">Question Id:</label>
-            <input type="text" disabled id="question_id" name="question_id" style=" padding: 10px;" required>
+            <input type="text" disabled id="question_id" name="question_id" style="padding: 10px;" required>
         </div>
             <!-- <label for="filter">Filter : </label>
             <select name="filter" id="filter">
@@ -168,7 +173,7 @@
                 <option value="Not Verified">Not Verified</option>
             </select> -->
         
-        <button class="button">Next Question&nbsp;
+        <button class="button" id="next-question-btn">Next Question&nbsp;
             <i class="fa fa-chevron-right"></i>
         </button>
         
@@ -225,142 +230,177 @@
                 </select>
             </div>
 
-            <button type="submit" class="button" style="float: right;">Update Question</button>
+            <button type="submit" id="update-question-btn" class="button" style="float: right;">Update Question</button>
         </form>
 
     </section>
 
-
-
-
-
-
-
-
+    <!-- this page will fetch the question_id from url and loads the question from database into form -->
+    
     <script>
-    $(document).ready(function() {
 
-        // Fetch and display students
-        function loadQuestions() {
-            $.ajax({
-                url: "fetch_questions.php",
-                method: "GET",
-                dataType: "json",
-                success: function(data) {
-                    let rows = "";
-                    $.each(data, function(index, question) {
-                        // let verified = student.verification_status == 1 ? "Yes" : "No";
-                        // let color = student.verification_status == 1 ? "green" : "red";
+        
+        const database_min_question_id = 
+            <?php
+            include "connection.php";
+            $sql_min = "SELECT MIN(question_id) AS min_id FROM questions_table";
+            $result_min = $conn->query($sql_min);
+            $min_id = 1;
+            if ($result_min->num_rows > 0) {
+                $row_min = $result_min->fetch_assoc();
+                $min_id = $row_min['min_id'];
+            }
+            echo $min_id;
+            ?>;
+        
+        const database_max_question_id = 
+            <?php
+            include "connection.php";
+            $sql_max = "SELECT MAX(question_id) AS max_id FROM questions_table";
+            $result_max = $conn->query($sql_max);
+            $max_id = 1;
+            if ($result_max->num_rows > 0) {
+                $row_max = $result_max->fetch_assoc();
+                $max_id = $row_max['max_id'];
+            }
+            echo $max_id;
+            ?>;
 
-                        // let button = "";
-
-                        // if (question.verification_status == 0) {
-                        editButton = `<button class="edit-btn fa fa-edit" data-id="${question.question_id}" 
-                                    style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                                    Edit</button>`;
-
-                        deleteButton = `<button class="delete-btn fa fa-trash" data-id="${question.question_id}" style="background-color:red;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                        Delete</button>`;
-
-
-                        // } else {
-                        //     button = `<span style="color:gray;">Verified</span>`;
-                        // }
-
-                        rows += `
-                            <tr>
-                                <td>${question.question_id}</td>
-                                <td>${question.subject_name}</td>
-                                <td>${question.question}</td>
-                                <td>${editButton} ${deleteButton}</td>
-                            </tr>
-                        `;
-                    });
-                    $("#questions-tbody").html(rows);
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error: " + error);
-                }
-            });
+        // Function to get query parameters from URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
-        // Initial load
-        loadQuestions();
 
-        //edit button click
-        // this button will open a new page where question can be edited with all options
-        $(document).on("click", ".edit-btn", function() {
-            const questionId = $(this).data("id");
-            // Redirect to edit question page with question ID as a query parameter
-            window.location.href = `edit_question.php?question_id=${questionId}`;
-        
-        });
+        $(document).ready(function() {
+            
 
+            // Fetch question_id from URL
+            const questionId = getQueryParam('question_id');
 
-
-        // delete button click
-        $(document).on("click", ".delete-btn", function() {
-            const questionId = $(this).data("id");
-            const button = $(this);
-
-            if (confirm("Are you sure you want to delete this question?")) {
+            if (questionId) {
+                // Make an AJAX request to fetch question details
                 $.ajax({
-                    url: "delete_question.php",
-                    method: "POST",
+                    url: 'get_question.php',
+                    type: 'GET',
                     data: { question_id: questionId },
+                    dataType: 'json',
                     success: function(response) {
-                        if (response.trim() === "success") {
-                            alert("Question deleted successfully!");
-                            loadQuestions(); // Refresh table
+                        if (response.success) {
+                            const question = response.data;
+                            // Populate the form fields with fetched data
+                            $('#question_id').val(question.question_id);
+                            $('#subject-name').val(question.subject_name);
+                            $('#question-text').val(question.question);
+                            $('#option_a').val(question.option_a);
+                            $('#option_b').val(question.option_b);
+                            $('#option_c').val(question.option_c);
+                            $('#option_d').val(question.option_d);
+
+                            // correct-option is a dropdown btn with four options
+                            // compare each option and select accordingly
+                            if(question.correct_answer === question.option_a)
+                                $('#correct-option').val('A');
+                            else if(question.correct_answer === question.option_b)
+                                $('#correct-option').val('B');
+                            else if(question.correct_answer === question.option_c)
+                                $('#correct-option').val('C');
+                            else if(question.correct_answer === question.option_d)
+                                $('#correct-option').val('D');
                         } else {
-                            alert("Error deleting question.");
+                            alert('Question not found.');
                         }
                     },
                     error: function() {
-                        alert("AJAX request failed.");
+                        alert('Error fetching question details.');
                     }
                 });
+            } else {
+                alert('No question ID provided in URL.');
             }
-        });
 
 
-
-
-
-
-
-
-
-
-        // 🔍 Search functionality
-        $("#search-box").on("keyup", function() {
-            const value = $(this).val().toLowerCase();
-            $("#questions-tbody tr").filter(function() {
-                $(this).toggle(
-                    $(this).text().toLowerCase().indexOf(value) > -1
-                );
+            // Next and Previous button functionality
+            $('#next-question-btn').click(function() {
+                const currentQuestionId = parseInt(getQueryParam('question_id'));
+                const nextQuestionId = currentQuestionId + 1;
+                // Redirect to the same page with the next question ID
+                window.location.href = `edit_question.php?question_id=${nextQuestionId}`;
+                
             });
+
+
+            $('#prev-question-btn').click(function() {
+            const currentQuestionId = parseInt(getQueryParam('question_id'));
+            const prevQuestionId = currentQuestionId - 1;
+            window.location.href = `edit_question.php?question_id=${prevQuestionId}`;
+                // Redirect to the same page with the previous question ID
+            
+            });
+
+
+            // Disable buttons if at the boundaries
+            const currentQuestionId = parseInt(getQueryParam('question_id'));
+
+            if(currentQuestionId <= database_min_question_id) { 
+                $('#prev-question-btn').prop('disabled', true);
+            }
+
+            if(currentQuestionId >= database_max_question_id) {
+                $('#next-question-btn').prop('disabled', true);
+            }
+
+            // update-question-btn updates question using ajax
+            $('#update-question-btn').click(function(e) {
+                e.preventDefault(); // Prevent default form submission
+                $.ajax({
+                    url: 'update_question.php',
+                    type: 'POST',
+                    data: {
+                        question_id: $('#question_id').val(),
+                        subject_name: $('#subject-name').val(),
+                        question_text: $('#question-text').val(),
+                        option_a: $('#option_a').val(),
+                        option_b: $('#option_b').val(),
+                        option_c: $('#option_c').val(),
+                        option_d: $('#option_d').val(),
+                        correct_option: $('#correct-option').val()
+                    },
+                    success: function(response) {
+                        if(response.trim() === 'success') {
+                            alert('Question updated successfully.');
+                        } else if(response.trim() === 'error') {
+                            alert('Error updating question.');
+                        } else if(response.trim() === 'invalid') {
+                            alert('Invalid data provided.');
+                        } else {
+                            alert('Unexpected response: ' + response);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating question.');
+                    }
+                });
+            });
+
+
+
+
+
         });
 
-        // ✅ Filter verified / not verified
-        // $("#filter").on("change", function() {
-        //     const filterValue = $(this).val();
-        //     $("#students-tbody tr").each(function() {
-        //         const status = $(this).find("td:nth-child(5)").text().trim();
-        //         if (filterValue === "All" ||
-        //             (filterValue === "Verified" && status === "Yes") ||
-        //             (filterValue === "Not Verified" && status === "No")) {
-        //             $(this).show();
-        //         } else {
-        //             $(this).hide();
-        //         }
-        //     });
-        // });
 
-    });
+        
+
+        
     </script>
 
 
+
+
+
+    
 
 
 
