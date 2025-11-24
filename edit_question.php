@@ -166,17 +166,22 @@
             <label for="question_id">Question Id:</label>
             <input type="text" disabled id="question_id" name="question_id" style="padding: 10px;" required>
         </div>
-            <!-- <label for="filter">Filter : </label>
-            <select name="filter" id="filter">
-                <option value="All">All</option>
-                <option value="Verified">Verified</option>
-                <option value="Not Verified">Not Verified</option>
-            </select> -->
+            
+
+        <div>
+            <!-- Add new question  -->
+            <button class="button" id="new-question-btn" style="background-color: green; margin-right: 10px;" >
+                <i class="fa fa-plus"></i>
+                &nbsp;Add New Question
+            </button>
+            
+            <button class="button" id="next-question-btn">Next Question&nbsp;
+                <i class="fa fa-chevron-right"></i>
+            </button>
         
-        <button class="button" id="next-question-btn">Next Question&nbsp;
-            <i class="fa fa-chevron-right"></i>
-        </button>
-        
+        </div>
+
+
     </section>
 
     <section class="main-section">
@@ -231,6 +236,8 @@
             </div>
 
             <button type="submit" id="update-question-btn" class="button" style="float: right;">Update Question</button>
+
+            <button type="submit" id="save-question-btn" class="button" style="float: right; display: none; background-color: green;">Save Question</button>
         </form>
 
     </section>
@@ -310,6 +317,11 @@
                                 $('#correct-option').val('D');
                         } else {
                             alert('Question not found.');
+                            $('#edit-question-form')[0].reset();
+                            // hide update btn
+                            $('#update-question-btn').hide();
+                            // add save btn
+                            $('#save-question-btn').show();
                         }
                     },
                     error: function() {
@@ -385,6 +397,14 @@
             });
 
 
+            // add new question button
+            $('#new-question-btn').click(function() {
+                // Redirect to edit_question.php with question_id as max_id + 1
+                const newQuestionId = database_max_question_id + 1;
+                window.location.href = `edit_question.php?question_id=${newQuestionId}`;
+                $('#question_id').val(newQuestionId);
+
+            });
 
 
 
