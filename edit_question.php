@@ -237,6 +237,7 @@
 
             <button type="submit" id="update-question-btn" class="button" style="float: right;">Update Question</button>
 
+            <!-- save-question-btn -->
             <button type="submit" id="save-question-btn" class="button" style="float: right; display: none; background-color: green;">Save Question</button>
         </form>
 
@@ -404,6 +405,44 @@
                 window.location.href = `edit_question.php?question_id=${newQuestionId}`;
                 $('#question_id').val(newQuestionId);
 
+            });
+
+
+            // save-question-btn functionality to save new question
+            $('#save-question-btn').click(function(e) {
+                e.preventDefault(); // Prevent default form submission
+                $.ajax({
+                    url: 'add_question.php',
+                    type: 'POST',
+                    data: {
+                        subject_name: $('#subject-name').val(),
+                        question_text: $('#question-text').val(),
+                        option_a: $('#option_a').val(),
+                        option_b: $('#option_b').val(),
+                        option_c: $('#option_c').val(),
+                        option_d: $('#option_d').val(),
+                        correct_option: $('#correct-option').val()
+                    },
+                    success: function(response) {
+                        if(response.trim() === 'success') {
+                            alert('Question added successfully.');
+                            //clear the form
+                            $('#edit-question-form')[0].reset();
+                            // Redirect to the newly added question's edit page
+                            // const newQuestionId = database_max_question_id + 1;
+                            // window.location.href = `edit_question.php?question_id=${newQuestionId}`;
+                        } else if(response.trim() === 'error') {
+                            alert('Error adding question.');
+                        } else if(response.trim() === 'invalid') {
+                            alert('Invalid data provided.');
+                        } else {
+                            alert('Unexpected response: ' + response);
+                        }
+                    },
+                    error: function() {
+                        alert('Error adding question.');
+                    }
+                });
             });
 
 

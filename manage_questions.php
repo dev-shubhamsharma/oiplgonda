@@ -172,15 +172,13 @@
     </header>
 
     <section id="button-section">
-        <input type="text" id="search-box" name="search" placeholder="Search by id or keyword..." onkeyup="searchQuestions()" style="width: 400px;" >
-        <!-- <div>
-            <label for="filter">Filter : </label>
-            <select name="filter" id="filter">
-                <option value="All">All</option>
-                <option value="Verified">Verified</option>
-                <option value="Not Verified">Not Verified</option>
-            </select>
-        </div> -->
+        <input type="text" id="search-box" name="search" placeholder="Search by id or keyword..." style="width: 400px;" >
+
+        <!-- Add new question  -->
+        <button class="button" id="new-question-btn" style="background-color: green; margin-right: 10px;" >
+            <i class="fa fa-plus"></i>
+            &nbsp;Add New Question
+        </button>
         
     </section>
 
@@ -313,20 +311,28 @@
             });
         });
 
-        // ✅ Filter verified / not verified
-        // $("#filter").on("change", function() {
-        //     const filterValue = $(this).val();
-        //     $("#students-tbody tr").each(function() {
-        //         const status = $(this).find("td:nth-child(5)").text().trim();
-        //         if (filterValue === "All" ||
-        //             (filterValue === "Verified" && status === "Yes") ||
-        //             (filterValue === "Not Verified" && status === "No")) {
-        //             $(this).show();
-        //         } else {
-        //             $(this).hide();
-        //         }
-        //     });
-        // });
+        const database_max_question_id = 
+            <?php
+            include "connection.php";
+            $sql_max = "SELECT MAX(question_id) AS max_id FROM questions_table";
+            $result_max = $conn->query($sql_max);
+            $max_id = 1;
+            if ($result_max->num_rows > 0) {
+                $row_max = $result_max->fetch_assoc();
+                $max_id = $row_max['max_id'];
+            }
+            echo $max_id;
+            ?>;
+
+        // New Question button click
+        $('#new-question-btn').click(function() {
+            // Redirect to edit_question.php with question_id as max_id + 1
+            const newQuestionId = database_max_question_id + 1;
+            // window.location.href = `edit_question.php?question_id=${newQuestionId}`,'_blank';
+            window.open(`edit_question.php?question_id=${newQuestionId}`, '_blank');
+            $('#question_id').val(newQuestionId);
+
+        });
 
     });
     </script>
