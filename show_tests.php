@@ -69,6 +69,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             box-sizing: border-box;
         }
 
+
         .button {
             padding: 10px 20px;
             background-color: #203f8eff;
@@ -172,23 +173,23 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
     <section class="buttons-container">
             
-        <a href="show_tests.php" class="button-link">
+        <a href="mocktest_instructions.php?testname=it_tools" class="button-link">
             <i class="fa fa-server"></i>
             <span>IT tools</span>
         </a>
 
-        <a href="exam.php" class="button-link">
+        <a href="mocktest_instructions.php?testname=web_design" class="button-link">
             <i class="fa fa-html5"></i>
             <span>Web Design</span>
         </a>
 
-        <a href="show_ranking.php" class="button-link">
+        <a href="mocktest_instructions.php?testname=python" class="button-link">
             <i class="fa fa-cogs"></i>
             <span>Python</span>
         </a>
 
 
-        <a href="change_password.php" class="button-link">
+        <a href="mocktest_instructions.php?testname=iot" class="button-link">
             <i class="fa fa-microchip"></i>
             <span>Internet of Things</span>
         </a>
