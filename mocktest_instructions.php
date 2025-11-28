@@ -11,6 +11,10 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 $testname = isset($_GET['testname']) ? $_GET['testname'] : 'no_test';
 
+
+$_SESSION["total_questions"] = $total_questions;
+$_SESSION["time_duration"] = $total_questions * 0.5; 
+
 // this script will fetch total questions and time duration from database based on basic of subject name
 if($testname == 'no_test'){
     echo "<h2>Error: No test selected.</h2>";
@@ -72,6 +76,8 @@ if ($result->num_rows > 0) {
 }
 $stmt->close();
 $conn->close(); 
+
+// assuming each question has 0.5 minutes
 
 
 
@@ -187,6 +193,8 @@ $conn->close();
                 window.location.href = 'mocktest_window.php?testname=<?php echo $testname; ?>';
             });
         });
+
+    </script>
 
 </body>
 </html>
