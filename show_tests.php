@@ -14,6 +14,7 @@
 
 
 <?php
+
 session_start();
 
 // Check if user is logged in
@@ -23,21 +24,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 }
 
 
-
-// Check if this is the admin user (using email check)
-// $admin_email = 'admin@oipl.com';  // <-- your real admin email
-// echo $_SESSION['user_id'];
-// echo $_SESSION['user_name'];
-// echo $_SESSION['logged_in'];
-// echo $_SESSION['user_email_id'];
-
-// if ($_SESSION['user_email_id'] !== $admin_email) {
-//     echo "<h2>Access Denied: You are not authorized to view this page.</h2>";
-
-//     echo "Go to <a href='login.php'> Login Page</a>";
-//     // header('Location: login.php');
-//     exit();
-// }
 ?>
 
 
@@ -69,6 +55,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
         }
 
 
@@ -103,7 +90,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             /* text-align: center; */
             /* margin: 10px; */
             /* padding: 20px; */
-            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            
             color: #2B32B2;
             font-size: 35px;
             /* border-bottom: 2px solid #ccc; */
@@ -126,6 +113,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             border-radius: 10px;
             width: 200px;
             transition: background-color 0.3s, color 0.3s;
+            background: whitesmoke;
+            font-size: 18px;
         }
 
         .button-link:hover {
@@ -174,7 +163,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     </header>
 
     <section class="buttons-container">
-            
+        
+        
+
         <a href="mocktest_instructions.php?testname=it_tools" class="button-link">
             <i class="fa fa-server"></i>
             <span>IT tools</span>
