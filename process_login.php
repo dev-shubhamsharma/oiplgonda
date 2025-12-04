@@ -49,7 +49,6 @@
 
         // var_dump($password);
 
-
         include "connection.php"; 
 
         // var_dump($password);
@@ -75,9 +74,6 @@
                 $verification_status = $row['verification_status'];
 
                 // var_dump($password, $hashed_password, password_verify($password, $hashed_password));
-
-                
-
 
                 if (password_verify($password, $hashed_password)) {
                     // Password is correct

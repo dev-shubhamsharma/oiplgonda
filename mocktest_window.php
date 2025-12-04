@@ -265,28 +265,28 @@
 
         <label for="a">
         <div class="option-container" id="option_a">
-            <input type="radio" name="option" id="a">
+            <input type="radio" name="option" id="a" value="">
             <p id="option_a_label">Internet of Things is a network of physical objects</p>
         </div>
         </label>
 
         <label for="b">
         <div class="option-container" id="option_b">
-            <input type="radio" name="option" id="b">
+            <input type="radio" name="option" id="b" value="">
             <p id="option_b_label">Internet of Things is a programming language</p>
         </div>
         </label>
 
         <label for="c">
         <div class="option-container" id="option_c">
-            <input type="radio" name="option" id="c">
+            <input type="radio" name="option" id="c" value="">
             <p id="option_c_label">Internet of Things is a type of software</p>
         </div>
         </label>
 
         <label for="d">
         <div class="option-container" id="option_d">
-            <input type="radio" name="option" id="d">
+            <input type="radio" name="option" id="d" value="">
             <p id="option_d_label">Internet of Things is a database system</p>
         </div>
         </label>
@@ -316,11 +316,14 @@
 
     <script>
 
+        let questionId = null;
+        let selectedAnswer = null;
+
         function loadQuestion(questionIndex) {
             // let questionIndex = <?php echo $_SESSION["current_question_index"]; ?>;
             let questionIds = <?php echo json_encode($_SESSION["question_ids"]); ?>;
             // console.log(questionIds);
-            let questionId = questionIds[questionIndex];
+            questionId = questionIds[questionIndex];
             console.log(questionIndex);
             console.log(questionId);
 
@@ -350,9 +353,17 @@
                     if (response.success) {
                         $('#question-text').text('Question ' + (questionIndex + 1) + ': ' + response.data.question);
                         $('#option_a_label').text(response.data.option_a);
+                        $('#a').val(response.data.option_a);
                         $('#option_b_label').text(response.data.option_b);
+                        $('#b').val(response.data.option_b);
                         $('#option_c_label').text(response.data.option_c);
+                        $('#c').val(response.data.option_c);
                         $('#option_d_label').text(response.data.option_d);
+                        $('#d').val(response.data.option_d);
+
+                        // load answer if all fiels are set
+                        loadPreviousAnswer(0);
+
                     } else {
                         alert('Failed to load question.');
                     }
@@ -364,12 +375,63 @@
         }
 
 
+        // load previous answer given if available
+        function loadPreviousAnswer(questionIndex) {
+            let questionIds = <?php echo json_encode($_SESSION["question_ids"]); ?>;
+            // console.log(questionIds);
+            questionId = questionIds[questionIndex];
+            userId = <?php echo $_SESSION["user_id"]; ?>
+
+            console.log(questionId)
+            console.log(userId)
+
+            $.ajax({
+                url: 'load_previous_answer.php',
+                type: 'POST',
+                data: { 
+                    question_id: questionId,
+                    user_id:userId 
+                },
+                dataType: 'json',
+                success: function(response) {
+                    response = response.trim();
+                    console.log(response);
+                    console.log($('#a').val() === response);
+                    if ($('#a').val() === response) {
+                        $('#a').prop('checked', true);
+                    } else if ($('#b').val() === response) {
+                        $('#b').prop('checked', true);
+                    } else if ($('#c').val() === response) {
+                        $('#c').prop('checked', true);
+                    } else if ($('#d').val() === response) {
+                        $('#d').prop('checked', true);
+                    }
+                    else {
+                        console.log("answer not found")
+                    }
+
+
+
+
+                },
+                error: function() {
+                    alert('Error in AJAX request to get answer');
+                }
+            });
+            
+        }
+
+
+
+
+
 
 
         // load first question on page load using ajax via question index stored in session variable
         $(document).ready(function() {
             // enter_fullscreen();
             loadQuestion(0);
+            
             $('#end-test-button').hide();
 
         });
@@ -383,8 +445,45 @@
                 return;
             }
 
-            // clear previously selected option
-            $('input[name="option"]').prop('checked', false);
+        
+            questionIds = <?php echo json_encode($_SESSION["question_ids"]); ?>;
+            currentQuestionIndex = <?php echo $_SESSION["current_question_index"]; ?>;
+            userId = <?php echo $_SESSION['user_id'] ?>;
+
+            // check if already answered the question & fetch result is in database
+            $.ajax({
+                url: 'check_already_answered_question.php',
+                type: 'POST',
+                data: {
+                    question_id:questionId,
+                    user_id:userId
+                },
+                success: function(response) {
+                    console.log(response)
+                },
+                error: function() {
+                    alert('Error finding answer data');
+                }
+
+            });
+
+            
+            // save selected option via ajax call to a php file
+            $.ajax({
+                url: 'save_answer_for_mocktest_window.php',
+                type: 'POST',
+                data: { 
+                    question_id:questionId,
+                    selected_answer: selectedOption 
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function() {
+                    alert('Error saving answer.');
+                }
+            });
+
 
 
             // increment current_question_index in session variable via ajax call to a php file
@@ -402,6 +501,11 @@
                 }
             });
 
+            // clear previously selected option
+            $('input[name="option"]').prop('checked', false);
+
+
+
         });
 
         $('#prev-button').click(function() {
@@ -414,11 +518,18 @@
                     console.log(response);
                     // reload question
                     loadQuestion(parseInt(response));
+                    currentQuestionIndex = <?php echo $_SESSION["current_question_index"]; ?>;
+                    console.log(currentQuestionIndex);
+                    loadPreviousAnswer(currentQuestionIndex);
+
                 },
                 error: function() {
                     alert('Error updating question index.');
                 }
             });
+
+           
+            // 
             
         });
 
