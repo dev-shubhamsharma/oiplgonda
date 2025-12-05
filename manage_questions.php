@@ -102,6 +102,10 @@
             /* margin: 50px; */
         }
 
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
         th {
             color: #1488CC;
         }
@@ -174,6 +178,8 @@
     <section id="button-section">
         <input type="text" id="search-box" name="search" placeholder="Search by id or keyword..." style="width: 400px;" >
 
+        <p id="entry-count">Total Entries : 0</p>
+
         <!-- Add new question  -->
         <button class="button" id="new-question-btn" style="background-color: green; margin-right: 10px;" >
             <i class="fa fa-plus"></i>
@@ -245,6 +251,10 @@
                         `;
                     });
                     $("#questions-tbody").html(rows);
+
+                    var rowCount = $('#questions-tbody tr:visible').length;
+                    $("#entry-count").html("Total Entries : "+rowCount);
+                    console.log(rowCount);
                 },
                 error: function(xhr, status, error) {
                     console.error("Error: " + error);
@@ -254,6 +264,7 @@
 
         // Initial load
         loadQuestions();
+
 
         //edit button click
         // this button will open a new page in new tab where question can be edited with all options
@@ -309,6 +320,12 @@
                     $(this).text().toLowerCase().indexOf(value) > -1
                 );
             });
+            var rowCount = $('#questions-tbody tr:visible').length;
+            $("#entry-count").html("Total Entries : "+rowCount);
+            console.log(rowCount);
+
+
+            
         });
 
         const database_max_question_id = 

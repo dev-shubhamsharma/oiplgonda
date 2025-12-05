@@ -1,40 +1,82 @@
+<?php 
+session_start();
 
-<?php
-    // mocktest_window.php
-    // This file serves as the main interface for taking a mock test.
+// echo $_SESSION["testname"];
 
-    session_start();
-    
-    if(isset($_SESSION['testname'])) {
-        $test_title = $_SESSION['testname'];
-    } else {
-        $test_title = "Unknown Test";
+$testname = $_SESSION["testname"];
+// echo $testname;
+// Mapping for show test_title on top according to testname
+
+$test_title = null;
+
+if($testname == "it_tools")
+    $test_title = "IT Tools and Networking";
+else if($testname == "web_design")
+    $test_title = "Web Designing and Publishing";
+else if($testname == "python")
+    $test_title = "Programming using Python";
+else if($testname == "iot")
+    $test_title = "Internet of Things - IoT";
+
+
+$user_id = $_SESSION["user_id"];
+$user_name = $_SESSION["user_name"];
+
+// fetch question_ids from questions_table with selected subject
+$subject_name = $_SESSION["subject_name"];
+// echo $subject_name;
+
+
+include "connection.php";
+
+$query = "select question_id from questions_table where subject_name = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('s',$subject_name);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$question_ids = [];
+while($row = $result->fetch_assoc())
+{
+    array_push($question_ids, $row["question_id"]); 
+}
+
+// all question_id is contained in an array
+$_SESSION["question_ids"] = $question_ids;
+$_SESSION["current_question_index"] = 0;  
+// print_r($question_ids);
+$last_question_index = count($question_ids)-1;
+// echo $last_question_index;
+
+
+// create rows with user_id and question_id in mocktest_answers table for updating answers
+// question id is stored in an array $question_ids
+
+$check_query = "select * from mocktest_answers where user_id=? and question_id= ?";
+foreach($question_ids as $question_id) {
+    $check_stmt = $conn->prepare($check_query);
+    $check_stmt->bind_param('ii',$user_id, $question_id);
+    $check_stmt->execute();
+    $result = $check_stmt->get_result();
+    if($result->num_rows == 0)
+    {
+        // insert user_id and question_id if not previously exist
+
+        $insert_query = "insert into mocktest_answers(user_id, question_id) values (?,?)";
+
+        $insert_stmt = $conn->prepare($insert_query);
+        $insert_stmt->bind_param('ii',$user_id, $question_id);
+        $insert_stmt->execute();
     }
+}
 
+// $insert_stmt->close();
+$check_stmt->close();
+$conn->close();
 
-    if(isset($_GET['testname'])) {
-        $_SESSION["testname"] = $_GET['testname'];
-        
-    }
-
-    $test_title = $_SESSION["testname"];
-    if($test_title == 'it_tools') {
-        $test_title = "IT Tools and Networking";
-    } elseif ($test_title == 'web_design') {
-        $test_title = "Web Design and Publishing";
-    } elseif ($test_title == 'python') {
-        $test_title = "Python Programming";
-    } elseif ($test_title == 'iot') {
-        $test_title = "Internet of Things";
-    } else {
-        $test_title = "Unknown Test";
-    }
-
-
-    // $total_questions = $_SESSION["total_questions"];
-    // $time_in_minutes = $_SESSION["time_duration"];
 
 ?>
+
 
 
 
@@ -97,6 +139,9 @@
             padding: 10px 20px;
             color: #fff;
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .question-container {
@@ -127,6 +172,11 @@
             width: 25px;
             height: 25px;
             /* margin-top: 4px; */
+        }
+
+        input[type="radio"]:checked ~ p{
+            color:green;
+            font-weight: bold;
         }
 
         .option-container label {
@@ -168,79 +218,30 @@
         }
 
 
+        #overlay {
+            height: 100vh;
+            width: 100vw;
+            background-color: rgba(0, 0, 0, 0.8);
+            position: absolute;
+            top: 0;
+            left: 0;
+
+        }
+
+        /* to prevent selection of text */
+
+        p,label,button,h1,h2 {
+            user-select: none;
+        }
+
+
     </style>
 
 
 </head>
 <body>
 
-        <?php  
-        // echo "session variable value is ".$_SESSION["testname"];
-        $subject_name = "";
 
-        if($_SESSION["testname"] === "it_tools")
-            $subject_name = "It Tools";
-        else if($_SESSION["testname"] === "web_design")
-            $subject_name = "Web Design";
-        else if($_SESSION["testname"] === "python")
-            $subject_name = "Python";
-        else if($_SESSION["testname"] === "iot")
-            $subject_name = "IoT";
-        else
-            $subject_name = "";
-        
-        ?>
-
-
-        <?php  
-        
-        include "connection.php";
-
-        $query = "select question_id from questions_table where subject_name = '".$subject_name."' ";
-        $result = mysqli_query($conn, $query);
-        if(!$result) {
-            echo "Error in query execution: " . mysqli_error($conn);
-            exit();
-        }
-        else {
-            $total_questions = mysqli_num_rows($result);
-            // var_dump($result);
-            // convert result to associative array
-
-            $questions = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            // echo "<br>Total questions in ".$subject_name." are ".$total_questions."<br>";
-            // print_r($questions);
-
-            // echo "<br>Questions are:<br>";
-            // foreach($questions as $row) {
-            //     echo $row["question_id"]."<br>";
-            // }
-
-            // put these question ids in session variable
-            $_SESSION["question_ids"] = array();
-            foreach($questions as $row) {
-                array_push($_SESSION["question_ids"], $row["question_id"]);
-            }
-
-            // print_r($_SESSION["question_ids"]);
-
-            $_SESSION["current_question_index"] = 0;
-
-            // on click of next button, increment the current_question_index by 1
-
-
-            
-            // on click of prev button, decrement the current_question_index by 1
-
-
-
-            // echo mysqli_fetch_assoc($result);
-
-            // echo "<br>Total questions in ".$subject_name." are ".$total_questions;
-        }
-        
-        
-        ?>
     <section id="top">
 
     </section>    
@@ -253,14 +254,18 @@
 
         <div id="title-container">
             <h2 id="test-title">
-                <?php 
-                    echo $test_title;
-                ?>
+                <?php echo $test_title; ?>
             </h2>
+
+
+            <p>
+                Name :
+                <?php echo $user_name;?> 
+            </p>
         </div>
 
         <div class="question-container">
-            <p id="question-text">Question <?php echo $_SESSION["current_question_index"] + 1; ?>: What is IoT?</p>
+            <p id="question-text"> What is IoT?</p>
         </div>
 
         <label for="a">
@@ -313,90 +318,209 @@
 
     </main>
 
+    <div id="overlay"></div>
 
     <script>
+        $('document').ready(function(){
 
-        let questionId = null;
-        let selectedAnswer = null;
+            // hide overlay message
+            $("#overlay").hide();
+            $('#end-test-button').hide();
+            $('#prev-button').prop('disabled',true);
 
-        function loadQuestion(questionIndex) {
-            // let questionIndex = <?php echo $_SESSION["current_question_index"]; ?>;
-            let questionIds = <?php echo json_encode($_SESSION["question_ids"]); ?>;
-            // console.log(questionIds);
-            questionId = questionIds[questionIndex];
-            console.log(questionIndex);
-            console.log(questionId);
+            $(document).on("contextmenu", function (e) {
+                alert("Right-click is disabled during the mocktest.");
+                return false;
+            });
 
-            if(questionIndex >= questionIds.length - 1) {
-                // $('#next-button').prop('disabled', true);
-                $('#next-button').hide();
-                $('#end-test-button').show();
 
-                
-            }else if(questionIndex <= 0) {
-                $('#prev-button').prop('disabled', true);
-            }
-            else {
-                $('#prev-button').prop('disabled', false);
-                $('#next-button').show();
-                $('#end-test-button').hide();
+            loadNextQuestion();
 
-                
-            }
+        });
 
+
+        // detect browser tab switching 
+        // tabSwitchingCount = 3;
+        // $(document).on("visibilitychange", function () {
+        //     if (document.hidden) {
+        //         alert("Tab switchig restricted, Exam will be auto submitted");
+        //         tabSwitchingCount--;
+
+        //         if(tabSwitchingCount == 0)
+        //         {
+        //             alert("Mocktest ended");
+        //             finishTest();
+        //         }
+                    
+        //         // You can log or submit exam here
+        //     }
+        // });
+
+
+
+        
+        function loadNextQuestion() 
+        {
+            
             $.ajax({
-                url: 'load_question_for_mocktest_window.php',
-                type: 'GET',
-                data: { question_id: questionId },
+                type:"POST",
+                url:"load_next_question.php",
                 dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#question-text').text('Question ' + (questionIndex + 1) + ': ' + response.data.question);
-                        $('#option_a_label').text(response.data.option_a);
-                        $('#a').val(response.data.option_a);
-                        $('#option_b_label').text(response.data.option_b);
-                        $('#b').val(response.data.option_b);
-                        $('#option_c_label').text(response.data.option_c);
-                        $('#c').val(response.data.option_c);
-                        $('#option_d_label').text(response.data.option_d);
-                        $('#d').val(response.data.option_d);
+                success: function(response){
+                    console.log(response);
+                    
+                    $("#question-text").html("Q"+(response.current_question_index+1)+". "+response.question);
+                    $("#option_a_label").html(response.option_a);
+                    $("#a").val(response.option_a);
+                    $("#option_b_label").html(response.option_b);
+                    $("#b").val(response.option_b);
+                    $("#option_c_label").html(response.option_c);
+                    $("#c").val(response.option_c);
+                    $("#option_d_label").html(response.option_d);
+                    $("#d").val(response.option_d);
 
-                        // load answer if all fiels are set
-                        loadPreviousAnswer(0);
 
-                    } else {
-                        alert('Failed to load question.');
+                    loadSavedAnswer();
+
+                    // console.log(response.current_question_index);
+                    if(response.current_question_index == <?php echo $last_question_index; ?>)
+                    {
+                        $("#next-button").prop("disabled",true);
+                        $("#next-button").hide();
+                        $("#end-test-button").show();
+
                     }
+                    else 
+                    {
+                        $("#next-button").prop("disabled",false);
+                        $("#next-button").show();
+                        $("#end-test-button").hide();
+                    }
+                        
+
                 },
-                error: function() {
-                    alert('Error in AJAX request.');
+                error: function(xhr,status,error) {
+                    console.log(xhr,status,error);
+
                 }
             });
         }
 
 
-        // load previous answer given if available
-        function loadPreviousAnswer(questionIndex) {
-            let questionIds = <?php echo json_encode($_SESSION["question_ids"]); ?>;
-            // console.log(questionIds);
-            questionId = questionIds[questionIndex];
-            userId = <?php echo $_SESSION["user_id"]; ?>
+        function finishTest() 
+        {
+            console.log("Finish test");
+            // $("button").prop("disabled",true);
+            $("#overlay").show();
+        }
 
-            console.log(questionId)
-            console.log(userId)
 
+
+
+        $("#end-test-button").click(function(){
+            if($("input[type='radio']:checked").length === 0) {
+                alert("Please select an option");
+            }
+            else {
+                let selectedAnswer = $("input[type='radio']:checked").val();
+                console.log(selectedAnswer);
+                
+                // update answer into database
+                $.ajax({
+                    type:'POST',
+                    url:'save_selected_answer.php',
+                    data:{selected_answer:selectedAnswer},
+                    dataType: 'json',
+                    success:function(response){
+                        console.log(response);
+                        res = confirm("Do you want to submit test?");
+                        if(res) 
+                        {
+                            finishTest();
+                        }
+                        
+                        // loadNextQuestion();
+                        // $("#prev-button").prop("disabled",false);
+                    },
+                    error:function(xhr,status,error){
+                        console.log(xhr,status,error);
+                    }
+      
+
+                });
+
+
+
+            } 
+        });
+
+
+
+
+        $("#next-button").click(function(){
+            if($("input[type='radio']:checked").length === 0) {
+                alert("Please select an option");
+            }
+            else {
+                let selectedAnswer = $("input[type='radio']:checked").val();
+                console.log(selectedAnswer);
+                
+                // update answer into database
+                $.ajax({
+                    type:'POST',
+                    url:'save_selected_answer.php',
+                    data:{selected_answer:selectedAnswer},
+                    dataType: 'json',
+                    success:function(response){
+                        console.log(response);
+                        loadNextQuestion();
+                        $("#prev-button").prop("disabled",false);
+
+                    },
+                    error:function(xhr,status,error){
+                        console.log(xhr,status,error);
+                    }
+      
+
+                });
+
+
+
+            } 
+        });
+
+
+        $("#prev-button").click(function(){
+            // decrement current question index only and load question
             $.ajax({
-                url: 'load_previous_answer.php',
-                type: 'POST',
-                data: { 
-                    question_id: questionId,
-                    user_id:userId 
+                type:'POST',
+                url:'decrement_current_index.php',
+                success:function(response){
+                    console.log("current index is "+response);
+                    loadNextQuestion();
+                    if(response == 0)
+                        $("#prev-button").prop("disabled",true);
+
                 },
+                error:function(xhr,status,error){
+                    console.log(xhr,status,error);
+                }
+    
+
+            });
+
+        }); 
+
+
+
+
+        function loadSavedAnswer() {
+            $.ajax({
+                type:'POST',
+                url:'load_saved_answer.php',
                 dataType: 'json',
-                success: function(response) {
-                    response = response.trim();
+                success:function(response){
                     console.log(response);
-                    console.log($('#a').val() === response);
                     if ($('#a').val() === response) {
                         $('#a').prop('checked', true);
                     } else if ($('#b').val() === response) {
@@ -407,173 +531,20 @@
                         $('#d').prop('checked', true);
                     }
                     else {
-                        console.log("answer not found")
+                        console.log("response not matched with any option")
+                        $("input[name='option']").prop('checked',false);
                     }
-
-
-
-
                 },
-                error: function() {
-                    alert('Error in AJAX request to get answer');
+                error:function(xhr,status,error){
+                    console.log(xhr,status,error);
                 }
             });
-            
         }
 
 
 
 
-
-
-
-        // load first question on page load using ajax via question index stored in session variable
-        $(document).ready(function() {
-            // enter_fullscreen();
-            loadQuestion(0);
-            
-            $('#end-test-button').hide();
-
-        });
-
-
-        $('#next-button').click(function() {
-            // alert if no option is selected
-            let selectedOption = $('input[name="option"]:checked').val();
-            if (!selectedOption) {
-                alert("Please select an option before proceeding.");
-                return;
-            }
-
-        
-            questionIds = <?php echo json_encode($_SESSION["question_ids"]); ?>;
-            currentQuestionIndex = <?php echo $_SESSION["current_question_index"]; ?>;
-            userId = <?php echo $_SESSION['user_id'] ?>;
-
-            // check if already answered the question & fetch result is in database
-            $.ajax({
-                url: 'check_already_answered_question.php',
-                type: 'POST',
-                data: {
-                    question_id:questionId,
-                    user_id:userId
-                },
-                success: function(response) {
-                    console.log(response)
-                },
-                error: function() {
-                    alert('Error finding answer data');
-                }
-
-            });
-
-            
-            // save selected option via ajax call to a php file
-            $.ajax({
-                url: 'save_answer_for_mocktest_window.php',
-                type: 'POST',
-                data: { 
-                    question_id:questionId,
-                    selected_answer: selectedOption 
-                },
-                success: function(response) {
-                    console.log(response);
-                },
-                error: function() {
-                    alert('Error saving answer.');
-                }
-            });
-
-
-
-            // increment current_question_index in session variable via ajax call to a php file
-            $.ajax({
-                url: 'update_question_index_for_mocktest_window.php',
-                type: 'POST',
-                data: { action: 'next' },
-                success: function(response) {
-                    console.log(response);
-                    // reload question
-                    loadQuestion(parseInt(response));
-                },
-                error: function() {
-                    alert('Error updating question index.');
-                }
-            });
-
-            // clear previously selected option
-            $('input[name="option"]').prop('checked', false);
-
-
-
-        });
-
-        $('#prev-button').click(function() {
-            // increment current_question_index in session variable via ajax call to a php file
-            $.ajax({
-                url: 'update_question_index_for_mocktest_window.php',
-                type: 'POST',
-                data: { action: 'prev' },
-                success: function(response) {
-                    console.log(response);
-                    // reload question
-                    loadQuestion(parseInt(response));
-                    currentQuestionIndex = <?php echo $_SESSION["current_question_index"]; ?>;
-                    console.log(currentQuestionIndex);
-                    loadPreviousAnswer(currentQuestionIndex);
-
-                },
-                error: function() {
-                    alert('Error updating question index.');
-                }
-            });
-
-           
-            // 
-            
-        });
-
-        // $(document).one("click", function () {   // <-- .one makes it run only once
-        //     enter_fullscreen();
-        // });
-
-
-        // function enter_fullscreen() {
-        //     let elem = document.documentElement;
-        //     if (elem.requestFullscreen) {
-        //         elem.requestFullscreen();
-        //     } else if (elem.mozRequestFullScreen) { /* Firefox */
-        //         elem.mozRequestFullScreen();
-        //     } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-        //         elem.webkitRequestFullscreen();
-        //     } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        //         elem.msRequestFullscreen();
-        //     }
-        // }
-
-
-
-        // to detech fullscreen exit
-        // $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange", function () {
-        //     if (!document.fullscreenElement &&
-        //         !document.webkitFullscreenElement &&
-        //         !document.mozFullScreenElement &&
-        //         !document.msFullscreenElement) {
-
-        //     // User exited fullscreen
-        //         alert("You exited fullscreen. Test will be submitted.");
-        //         // go back to full screen
-        //         $(document).one("click", function () {   // <-- .one makes it run only once
-        //             enter_fullscreen();
-        //         });
-        //     }
-        // });
-
-
-
-
     </script>
-
 
 </body>
 </html>

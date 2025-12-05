@@ -1,88 +1,56 @@
-<?php
+<?php 
 
-// mocktest_instructions.php
+$testname = $_GET["testname"];
+
+
+$total_questions = 0;
+$total_duration_in_minutes = 0;
+
+
+// mapping of testname to database subject name
+if($testname == "it_tools")
+    $subject_name = "IT Tools";
+else if($testname == "web_design")
+    $subject_name = "Web Design";
+else if($testname == "python")
+    $subject_name = "Python";
+else if($testname == "iot")
+    $subject_name = "IoT";
+
+// set into session for access
 session_start();
-$current_year = date("Y");
-// Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: login.php');
-    exit();
-}   
+$_SESSION["testname"] = $testname;
+// echo $testname;
+// echo $_SESSION["testname"];
+$_SESSION["subject_name"] = $subject_name;
 
-$testname = isset($_GET['testname']) ? $_GET['testname'] : 'no_test';
-
-
-
-// this script will fetch total questions and time duration from database based on basic of subject name
-if($testname == 'no_test'){
-    echo "<h2>Error: No test selected.</h2>";
-    exit();
-}
-
-if(!in_array($testname, ['it_tools', 'web_design', 'python', 'iot'])) {
-    echo "<h2>Error: Invalid test selected.</h2>";
-    exit();
-}
-
-if($testname == 'it_tools') {
-    $display_testname = "IT Tools";
-} elseif ($testname == 'web_design') {
-    $display_testname = "Web Design";
-} elseif ($testname == 'python') {
-    $display_testname = "Python";
-} elseif ($testname == 'iot') {
-    $display_testname = "IoT";
-} else {
-    $display_testname = "Unknown Test";
-}
-
-if(!isset($_SESSION['testname'])) {
-    $_SESSION['testname'] = $testname;
-} else {
-    $_SESSION['testname'] = $testname;
-}
-
-if(!isset($_SESSION['test_started'])) {
-    $_SESSION['test_started'] = false;
-}
-
-if(!isset($_SESSION['test_completed'])) {
-    $_SESSION['test_completed'] = false;
-}
-
-if(!isset($_SESSION['score'])) {
-    $_SESSION['score'] = 0;
-}
-
-if(!isset($_SESSION['time_left'])) {
-    $_SESSION['time_left'] = 30 * 60; // 30 minutes in seconds
-}
+// echo $testname ;
+// echo $subject_name;
 
 include "connection.php";
 
-// include count function
-$sql = "SELECT COUNT(*) AS total_questions FROM questions_table WHERE subject_name = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $display_testname);
+$query = "select COUNT(*) as total_rows from questions_table where subject_name = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('s',$subject_name);
 $stmt->execute();
 $result = $stmt->get_result();
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $total_questions = $row['total_questions'];
-} else {
-    $total_questions = 0;
-}
-$stmt->close();
-$conn->close(); 
+$row = $result->fetch_assoc();
 
-// assuming each question has 0.5 minutes
+$total_questions = $row['total_rows'];
 
+// set into session to access on other page 
 
 $_SESSION["total_questions"] = $total_questions;
+$_SESSION["total_duration_in_minutes"] = $total_questions * 0.5;
+// echo $total_questions;
+
+
+
+$conn->close();
+
+
 
 ?>
-
-
 
 
 
@@ -162,14 +130,16 @@ $_SESSION["total_questions"] = $total_questions;
 <body>
     <h1>Mock Test Instructions</h1>
     <ul>
-        <li>Total Questions: <?php echo $total_questions ?></li>
+        <li>Total Questions: 
+            <?php echo $total_questions; ?>
+        </li>
         <li>Time Duration: 
-            
-        <?php 
-            // assuming each question has 1.5 minutes
-            $time_duration = $total_questions * 0.5; 
-            echo $time_duration;
-        ?>         minutes</li>
+            <?php 
+            $total_duration_in_minutes = $total_questions * 0.5;
+            echo $total_duration_in_minutes;
+            ?>    
+            minutes
+        </li>
         <li>Each question carries 1 mark</li>
         <li>No negative marking for wrong answers</li>
         <li>Do not refresh the page during the test</li>
@@ -189,7 +159,7 @@ $_SESSION["total_questions"] = $total_questions;
         $(document).ready(function() {
             $('#start-test-btn').click(function() {
                 // Redirect to test page
-                window.location.href = 'mocktest_window.php?testname=<?php echo $_SESSION["testname"]; ?>';
+                window.location.href = 'mocktest_window.php';
 
             });
         });

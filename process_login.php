@@ -80,7 +80,7 @@
                     if($verification_status == 1) {
                         // User is verified
 
-                         session_start(); // Start session early to use later
+                        session_start(); // Start session early to use later
 
                         
                         $_SESSION['user_id'] = $row['student_id'];
