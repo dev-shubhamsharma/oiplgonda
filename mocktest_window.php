@@ -44,7 +44,7 @@ while($row = $result->fetch_assoc())
 // all question_id is contained in an array
 $_SESSION["question_ids"] = $question_ids;
 $_SESSION["current_question_index"] = 0;  
-// print_r($question_ids);
+print_r($question_ids);
 $last_question_index = count($question_ids)-1;
 // echo $last_question_index;
 
@@ -221,12 +221,25 @@ $conn->close();
         #overlay {
             height: 100vh;
             width: 100vw;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(255, 255, 255,0.7);
             position: absolute;
             top: 0;
             left: 0;
-
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            font-size: 1rem;
+            text-align: center;
         }
+
+        #timer-text {
+            color: red;
+        }
+
+        
+
 
         /* to prevent selection of text */
 
@@ -300,9 +313,14 @@ $conn->close();
             <button id="prev-button">
                 Previous
             </button>
-            <p>
+            <p id="timer-text">
                 Time left : 
-                <span id="time-left">30:00</span>
+                <span id="time-left">
+                    <span id="minutes">00</span>
+                    :
+                    <span id="seconds">60</span>
+
+                </span>
             </p>
             <button id="next-button">
                 Save & Next&nbsp;
@@ -318,7 +336,15 @@ $conn->close();
 
     </main>
 
-    <div id="overlay"></div>
+    <div id="overlay">
+        
+        <h2>Test Submitted</h2>
+        <p style="color:green;">Your answers have been saved successfully.</p>
+        <!-- <button id="go-dashboard-btn">
+             Go to Dashboard
+        </button> -->
+
+    </div>
 
     <script>
         $('document').ready(function(){
@@ -336,7 +362,10 @@ $conn->close();
 
             loadNextQuestion();
 
+            
+
         });
+
 
 
         // detect browser tab switching 
@@ -356,9 +385,35 @@ $conn->close();
         //     }
         // });
 
+        timer = null;
+        function startTimer()
+        {
+            minutes = <?php echo $_SESSION["total_duration_in_minutes"]-1; ?> ;
+            $("#minutes").html(minutes);
+            seconds = 60;
+            timer = setInterval(function(){
+                seconds--;
+                $("#seconds").html(seconds);
+                console.log(seconds);
+                if(seconds == 0)
+                {
+                    minutes--;
+                    $("#minutes").html(minutes);
+                    seconds = 59;
+                    if(minutes == 0)
+                    {
+                        clearInterval(timer);
+                        alert("Time ended! Submitting your Test");
+                        finishTest();
+                        
+                    }
+                }
+
+            },1000);
+        }
 
 
-        
+        var timerStarted = false;
         function loadNextQuestion() 
         {
             
@@ -381,6 +436,12 @@ $conn->close();
 
 
                     loadSavedAnswer();
+                    
+                    // ⭐ Start timer only on first question
+                    if (!timerStarted) {
+                        startTimer();
+                        timerStarted = true;
+                    }
 
                     // console.log(response.current_question_index);
                     if(response.current_question_index == <?php echo $last_question_index; ?>)
@@ -410,8 +471,10 @@ $conn->close();
         function finishTest() 
         {
             console.log("Finish test");
+            clearInterval(timer);
             // $("button").prop("disabled",true);
             $("#overlay").show();
+            window.location.href = "mocktest_result.php";
         }
 
 
