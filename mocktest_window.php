@@ -16,6 +16,23 @@ if(!isset($_SESSION["testname"]) || !isset($_SESSION["subject_name"]))
     exit();
 }
 
+if(!isset($_SESSION['test_start_time'])) {
+    $_SESSION['test_start_time'] = time(); // store timestamp when test starts
+}
+
+$total_duration_seconds = $_SESSION["total_duration_in_minutes"] * 60;
+$time_elapsed = time() - $_SESSION['test_start_time'];
+$time_left = $total_duration_seconds - $time_elapsed;
+
+if ($time_left < 0) {
+    $time_left = 0; // test time over
+}
+
+
+
+
+
+
 // echo $_SESSION["testname"];
 
 $testname = $_SESSION["testname"];
@@ -621,6 +638,28 @@ $conn->close();
                 }
             });
         }
+
+
+        let timeLeft = <?php echo $time_left; ?>; // time left in seconds
+
+        function startTimer() {
+            timer = setInterval(function() {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+
+                $("#minutes").html(minutes.toString().padStart(2, '0'));
+                $("#seconds").html(seconds.toString().padStart(2, '0'));
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("Time ended! Submitting your Test");
+                    finishTest();
+                }
+
+                timeLeft--;
+            }, 1000);
+        }
+
 
 
 
