@@ -2,6 +2,7 @@
 
 session_start();
 
+unset($_SESSION["testname"]);
 unset($_SESSION["subject_name"]);
 unset($_SESSION["question_ids"]);
 unset($_SESSION["current_question_index"]);

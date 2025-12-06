@@ -1,6 +1,21 @@
 <?php 
 session_start();
 
+if(!isset($_SESSION["user_id"]) || !isset($_SESSION["user_name"]) || !isset($_SESSION['user_email_id']))
+{
+    header("Location: login.php");
+    exit();
+}
+
+
+
+
+if(!isset($_SESSION["testname"]) || !isset($_SESSION["subject_name"]))
+{
+    header("Location: student_dashboard.php");
+    exit();
+}
+
 // echo $_SESSION["testname"];
 
 $testname = $_SESSION["testname"];
@@ -368,6 +383,7 @@ $conn->close();
 
 
 
+
         // detect browser tab switching 
         // tabSwitchingCount = 3;
         // $(document).on("visibilitychange", function () {
@@ -392,6 +408,8 @@ $conn->close();
             $("#minutes").html(minutes);
             seconds = 60;
             timer = setInterval(function(){
+
+                
                 seconds--;
                 $("#seconds").html(seconds);
                 console.log(seconds);

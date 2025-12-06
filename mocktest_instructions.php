@@ -1,4 +1,6 @@
 <?php 
+// set into session for access
+session_start();
 
 $testname = $_GET["testname"];
 
@@ -16,9 +18,10 @@ else if($testname == "python")
     $subject_name = "Python";
 else if($testname == "iot")
     $subject_name = "IoT";
+else {
+    die("Invalid testname provided.");   // stops page and prevents SQL error
+}
 
-// set into session for access
-session_start();
 $_SESSION["testname"] = $testname;
 // echo $testname;
 // echo $_SESSION["testname"];
@@ -135,8 +138,7 @@ $conn->close();
         </li>
         <li>Time Duration: 
             <?php 
-            $total_duration_in_minutes = $total_questions * 0.5;
-            echo $total_duration_in_minutes;
+            echo $_SESSION["total_duration_in_minutes"] ;
             ?>    
             minutes
         </li>
