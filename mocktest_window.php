@@ -84,20 +84,20 @@ $last_question_index = count($question_ids)-1;
 // create rows with user_id and question_id in mocktest_answers table for updating answers
 // question id is stored in an array $question_ids
 
-$check_query = "select * from mocktest_answers where user_id=? and question_id= ?";
+$check_query = "select * from mocktest_answers where user_id=? and subject_name=? and question_id= ?";
 foreach($question_ids as $question_id) {
     $check_stmt = $conn->prepare($check_query);
-    $check_stmt->bind_param('ii',$user_id, $question_id);
+    $check_stmt->bind_param('isi',$user_id, $subject_name, $question_id);
     $check_stmt->execute();
     $result = $check_stmt->get_result();
     if($result->num_rows == 0)
     {
         // insert user_id and question_id if not previously exist
 
-        $insert_query = "insert into mocktest_answers(user_id, question_id) values (?,?)";
+        $insert_query = "insert into mocktest_answers(user_id, subject_name, question_id) values (?,?,?)";
 
         $insert_stmt = $conn->prepare($insert_query);
-        $insert_stmt->bind_param('ii',$user_id, $question_id);
+        $insert_stmt->bind_param('isi',$user_id, $subject_name, $question_id);
         $insert_stmt->execute();
     }
 }

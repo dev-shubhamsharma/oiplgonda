@@ -1,11 +1,92 @@
 <?php 
 
-session_start();
+    session_start();
 
-unset($_SESSION["testname"]);
-unset($_SESSION["subject_name"]);
-unset($_SESSION["question_ids"]);
-unset($_SESSION["current_question_index"]);
+    // unset($_SESSION["testname"]);
+    // unset($_SESSION["subject_name"]);
+    // unset($_SESSION["question_ids"]);
+    // unset($_SESSION["current_question_index"]);
+
+    $user_id = $_SESSION["user_id"];
+    $subject_name = $_SESSION["subject_name"];
+
+
+    include "libs/jquery.php";
+    include "libs/font-awesome.php";
+    include "libs/google-font.php";
+
+    $score = 0;
+    $total_questions = $_SESSION["total_questions"];
+    $total_attempted = 0;
+    $correct_answers = $score;
+    $wrong_answers = 0;
+
+    $score = get_current_score();
+    $total_attempted = get_total_attempted();
+    $wrong_answers = get_wrong_answer();
+    $correct_answers = $score;
+
+
+    function get_current_score() {
+
+        include "connection.php";
+
+        $correct_answer_query = "SELECT COUNT(*) AS correct_answers FROM mocktest_answers AS m JOIN questions_table AS q ON m.question_id = q.question_id WHERE m.user_id = ? AND m.subject_name =? AND m.selected_answer = q.correct_answer";
+
+        // echo $GLOBALS["user_id"];
+
+        $stmt = $conn->prepare($correct_answer_query);
+        $stmt->bind_param('is',$GLOBALS["user_id"],$GLOBALS["subject_name"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        if($row) 
+        {
+            return $row["correct_answers"];
+        }
+        return 0;
+
+
+    }
+
+
+    function get_total_attempted() 
+    {
+        include "connection.php";
+
+        $attempted_query = "SELECT COUNT(*) AS attempted_questions FROM mocktest_answers WHERE user_id = ? and subject_name = ?";
+        $stmt = $conn->prepare($attempted_query);
+
+        $stmt->bind_param('is',$GLOBALS["user_id"],$GLOBALS["subject_name"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        if($row)
+        {
+            return $row["attempted_questions"];
+        }
+        return 0;
+    }
+
+    function get_wrong_answer()
+    {
+        include "connection.php";
+
+        $wrong_answer_query = "SELECT COUNT(*) AS wrong_answers FROM mocktest_answers AS m JOIN questions_table AS q ON m.question_id = q.question_id WHERE m.user_id = ? AND m.subject_name =? AND m.selected_answer != q.correct_answer";
+
+        $stmt = $conn->prepare($wrong_answer_query);
+        $stmt->bind_param('is',$GLOBALS["user_id"],$GLOBALS["subject_name"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        if($row) 
+        {
+            return $row["wrong_answers"];
+        }
+        return 0;
+    }
+
+
 
 ?>
 
@@ -120,7 +201,7 @@ unset($_SESSION["current_question_index"]);
         color: red;
     }
 
-    #go-dashboard-btn {
+    #continue-btn {
         background: linear-gradient(to right, #332dec, #17138fff);
         padding: 10px 20px;
         border-radius: 20px;
@@ -133,7 +214,7 @@ unset($_SESSION["current_question_index"]);
         transition-duration: 500ms;
     }
 
-    #go-dashboard-btn:hover {
+    #continue-btn:hover {
         background: linear-gradient(to left, #332dec, #17138fff)
     }
 
@@ -153,10 +234,10 @@ unset($_SESSION["current_question_index"]);
 
             <div class="circle"></div>
 
-            <p id="score">15</p>
-            <p id="total-para"> of <span id="total-score">100</span></p>
+            <p id="score"><?php echo $score; ?></p>
+            <p id="total-para"> of <span id="total-score"><?php echo $total_questions ?></span></p>
 
-            <p id="comment">You scored 56%</p>
+            <p id="comment">You scored <?php echo round(($score/$total_questions*100))."%"; ?></p>
 
         </div>
 
@@ -164,17 +245,41 @@ unset($_SESSION["current_question_index"]);
 
             <h3>Summary</h3>
 
-            <p>Total Questions : <span id="total-questions">100</span></p>
-            <p>Attempted : <span id="attempted-questions">80</span></p>
-            <p>Correct Answered : <span id="correct">10</span></p>
-            <p>Wrong Answered : <span id="wrong">15</span></p>
+            <p>Total Questions : <span id="total-questions"><?php echo $total_questions; ?></span></p>
+            <p>Attempted : <span id="attempted-questions"><?php echo $total_attempted; ?></span></p>
+            <p>Correct Answered : <span id="correct"><?php echo $correct_answers; ?></span></p>
+            <p>Wrong Answered : <span id="wrong"><?php echo$wrong_answers; ?></span></p>
 
 
-            <button id="go-dashboard-btn">Go to dashboard</button>
+            <button id="continue-btn">Continue</button>
 
         </div>
     </main>
 
+
+    <script>
+        $('document').ready(function(){
+            
+            $("#continue-btn").click(function(){
+                window.location.href="logout.php";
+            });
+
+
+
+            //prevent browser back button for questions            
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                window.location.href = "logout.php";
+            };
+
+
+
+
+
+        });
+
+
+    </script>
 
 
 </body>
