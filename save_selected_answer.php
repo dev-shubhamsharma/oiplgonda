@@ -15,10 +15,11 @@ if(isset($selected_answer) && !empty($selected_answer))
 {
     include "connection.php";
 
-    $update_query = "update mocktest_answers set selected_answer = ? where user_id = ? and question_id = ?";
+    $update_query = "update mocktest_answers set selected_answer = ?, datetime =? where user_id = ? and question_id = ?";
 
     $update_stmt = $conn->prepare($update_query);   
-    $update_stmt->bind_param('sii',$selected_answer,$user_id,$question_id);
+    $datetime = date("Y-m-d H:i:s");
+    $update_stmt->bind_param('ssii',$selected_answer,$datetime,$user_id,$question_id);
     
     if($update_stmt->execute())
     {

@@ -1,92 +1,132 @@
 <?php 
+session_start();
 
-    session_start();
+if (!isset($_SESSION["user_id"]) || !isset($_SESSION["subject_name"])) {
+    header("Location: logout.php");
+    exit;
+}
+include "libs/jquery.php";
+include "libs/font-awesome.php";
+include "libs/google-font.php";
 
-    // unset($_SESSION["testname"]);
-    // unset($_SESSION["subject_name"]);
-    // unset($_SESSION["question_ids"]);
-    // unset($_SESSION["current_question_index"]);
+include "connection.php";
 
-    $user_id = $_SESSION["user_id"];
-    $subject_name = $_SESSION["subject_name"];
+$user_id        = $_SESSION["user_id"];
+$user_name      = $_SESSION["user_name"];
+$subject_name   = $_SESSION["subject_name"];
+$total_questions = $_SESSION["total_questions"];
 
-
-    include "libs/jquery.php";
-    include "libs/font-awesome.php";
-    include "libs/google-font.php";
-
-    $score = 0;
-    $total_questions = $_SESSION["total_questions"];
-    $total_attempted = 0;
-    $correct_answers = $score;
-    $wrong_answers = 0;
-
-    $score = get_current_score();
-    $total_attempted = get_total_attempted();
-    $wrong_answers = get_wrong_answer();
-    $correct_answers = $score;
+// stores time in seconds
+$total_time_taken = get_total_time_taken($conn, $user_id, $subject_name);
 
 
-    function get_current_score() {
 
-        include "connection.php";
+// ---------- FUNCTIONS ----------
+function get_current_score($conn, $user_id, $subject_name) {
+    $sql = "SELECT COUNT(*) AS correct_answers 
+            FROM mocktest_answers m 
+            JOIN questions_table q 
+                ON m.question_id = q.question_id
+            WHERE m.user_id = ? AND m.subject_name = ? 
+                AND m.selected_answer = q.correct_answer";
 
-        $correct_answer_query = "SELECT COUNT(*) AS correct_answers FROM mocktest_answers AS m JOIN questions_table AS q ON m.question_id = q.question_id WHERE m.user_id = ? AND m.subject_name =? AND m.selected_answer = q.correct_answer";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $user_id, $subject_name);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()["correct_answers"] ?? 0;
+}
 
-        // echo $GLOBALS["user_id"];
+function get_total_attempted($conn, $user_id, $subject_name) {
+    $sql = "SELECT COUNT(*) AS attempted FROM mocktest_answers 
+            WHERE user_id = ? AND subject_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $user_id, $subject_name);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()["attempted"] ?? 0;
+}
 
-        $stmt = $conn->prepare($correct_answer_query);
-        $stmt->bind_param('is',$GLOBALS["user_id"],$GLOBALS["subject_name"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        if($row) 
-        {
-            return $row["correct_answers"];
-        }
-        return 0;
+function get_wrong_answer($conn, $user_id, $subject_name) {
+    $sql = "SELECT COUNT(*) AS wrong_answers 
+            FROM mocktest_answers m 
+            JOIN questions_table q ON m.question_id = q.question_id
+            WHERE m.user_id = ? AND m.subject_name = ? 
+                AND m.selected_answer != q.correct_answer";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $user_id, $subject_name);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()["wrong_answers"] ?? 0;
+}
 
 
-    }
+function get_total_time_taken($conn, $user_id, $subject_name) {
 
+    $sql = "SELECT 
+                MIN(datetime) AS start_time,
+                MAX(datetime) AS end_time
+            FROM mocktest_answers 
+            WHERE user_id = ? AND subject_name = ?";
 
-    function get_total_attempted() 
-    {
-        include "connection.php";
-
-        $attempted_query = "SELECT COUNT(*) AS attempted_questions FROM mocktest_answers WHERE user_id = ? and subject_name = ?";
-        $stmt = $conn->prepare($attempted_query);
-
-        $stmt->bind_param('is',$GLOBALS["user_id"],$GLOBALS["subject_name"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        if($row)
-        {
-            return $row["attempted_questions"];
-        }
-        return 0;
-    }
-
-    function get_wrong_answer()
-    {
-        include "connection.php";
-
-        $wrong_answer_query = "SELECT COUNT(*) AS wrong_answers FROM mocktest_answers AS m JOIN questions_table AS q ON m.question_id = q.question_id WHERE m.user_id = ? AND m.subject_name =? AND m.selected_answer != q.correct_answer";
-
-        $stmt = $conn->prepare($wrong_answer_query);
-        $stmt->bind_param('is',$GLOBALS["user_id"],$GLOBALS["subject_name"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        if($row) 
-        {
-            return $row["wrong_answers"];
-        }
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $user_id, $subject_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();  
+    echo "<script>console.log('Start Time: " . $row['start_time'] . "');</script>";
+    echo "<script>console.log('End Time: " . $row['end_time'] . "');</script>";
+    
+    if (!$row['start_time'] || !$row['end_time']) {
         return 0;
     }
 
+    $start = strtotime($row['start_time']);
+    $end   = strtotime($row['end_time']);
+    $total_seconds = $end - $start;
 
+    return $total_seconds;
+}
+
+
+function save_user_for_ranking($conn, $user_id, $user_name, $subject_name, $attempted, $correct, $total_time_taken) {
+
+    $check = $conn->prepare("SELECT * FROM ranking_table WHERE user_id = ? AND subject_name = ?");
+    $check->bind_param("is", $user_id, $subject_name);
+    $check->execute();
+    $result = $check->get_result();
+
+    if ($result->num_rows > 0) {
+        // Update existing record
+        $update = $conn->prepare("UPDATE ranking_table 
+            SET questions_attempted = ?, correctly_answered = ?, total_time_taken = ? 
+            WHERE user_id = ? AND subject_name = ?");
+        $update->bind_param("iiiss", $attempted, $correct, $total_time_taken, $user_id, $subject_name);
+
+        if ($update->execute()) {
+            echo "<script>console.log('Ranking updated');</script>";
+        }
+
+    } else {
+        // Insert new record
+        $insert = $conn->prepare("INSERT INTO ranking_table 
+            (user_id, user_name, subject_name, questions_attempted, correctly_answered, total_time_taken) 
+            VALUES (?, ?, ?, ?, ?, ?)");
+        $insert->bind_param("issiis", $user_id, $user_name, $subject_name, $attempted, $correct, $total_time_taken);
+
+        if ($insert->execute()) {
+            echo "<script>console.log('Ranking inserted');</script>";
+        }
+    }
+}
+
+
+// ---------- GET RESULTS ----------
+$score           = get_current_score($conn, $user_id, $subject_name);
+$total_attempted = get_total_attempted($conn, $user_id, $subject_name);
+$wrong_answers   = get_wrong_answer($conn, $user_id, $subject_name);
+$correct_answers = $score;
+
+// Save ranking
+save_user_for_ranking($conn, $user_id, $user_name, $subject_name, $total_attempted, $score, $total_time_taken);
 
 ?>
 

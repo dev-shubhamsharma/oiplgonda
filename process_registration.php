@@ -67,33 +67,49 @@
 
         include "connection.php"; 
 
-        // 1. Define the SQL statement with question mark (?) placeholders
-        // NOTE: I'm assuming the column name is 'name', not 'ame' based on standard practice.
-        $sql = "INSERT INTO student_registration_table (student_name, mobile_number, email_id, password, verification_status) VALUES (?, ?, ?, ?, ?)";
-
-        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $verification_status = 0; // Assuming 0 means not verified
-
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param('ssssi', $name, $mobile, $email, $hashed_password, $verification_status);
-
-        $response = [];
-        if($stmt->execute())
-        {
-             $response = [
-                "status" => "success",
-                "message" => "Student Registered Successfully."
-            ];
+        // check if email already exists
+        $check_query = "SELECT COUNT(*) AS count FROM student_registration_table WHERE email_id = ?";
+        $conn_stmt = $conn->prepare($check_query);
+        $conn_stmt->bind_param('s', $email);
+        $conn_stmt->execute();
+        $result = $conn_stmt->get_result()->fetch_assoc();
+        if ($result['count'] > 0) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Email is already registered.'
+            ]);
+            exit();
         }
         else
         {
-            $response = [
-                "status" => "error",
-                "message" => "Database insertion failed.",
-                "db_error" => $stmt->error // Include the specific MySQLi error message
-            ];
+            $sql = "INSERT INTO student_registration_table (student_name, mobile_number, email_id, password, verification_status) VALUES (?, ?, ?, ?, ?)";
+
+            $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+            // Assuming 0 means not verified
+            $verification_status = 0;     
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param('ssssi', $name, $mobile, $email, $hashed_password, $verification_status);
+            $response = [];
+            if($stmt->execute())
+            {
+                $response = [
+                    "status" => "success",
+                    "message" => "Student Registered Successfully."
+                ];
+            }
+            else
+            {
+                $response = [
+                    "status" => "error",
+                    "message" => "Database insertion failed.",
+                    "db_error" => $stmt->error // Include the specific MySQLi error message
+                ];
+            }
+
+
         }
 
+    
         echo json_encode($response);
 
         $stmt->close();

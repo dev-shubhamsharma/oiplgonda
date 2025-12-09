@@ -76,7 +76,7 @@ while($row = $result->fetch_assoc())
 // all question_id is contained in an array
 $_SESSION["question_ids"] = $question_ids;
 $_SESSION["current_question_index"] = 0;  
-print_r($question_ids);
+// print_r($question_ids);
 $last_question_index = count($question_ids)-1;
 // echo $last_question_index;
 
@@ -138,7 +138,7 @@ $conn->close();
 
         #top {
             height: 120px;
-            background-color: #32477cff;
+            background-color: #6e6e6eff;
         }
 
         #bottom {
@@ -165,7 +165,7 @@ $conn->close();
         #title-container {
             text-align: center;
             margin-bottom: 20px;
-            background-color: #e57435;
+            background-color: #064264ff;
             /* border-radius: 5px; */
             
             padding: 10px 20px;
