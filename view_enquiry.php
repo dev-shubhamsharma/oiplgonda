@@ -138,6 +138,59 @@ include "admin_only_validation.php";
             background-color: #203f8eff !important;
         }
 
+        #full-detail-section {
+            width: 100%;
+            min-height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 100px 50px;
+        }
+
+
+        #full-detail-section table {
+
+            /* margin: 100px 60px; */
+            border: 2px solid black;
+            background-color: lightblue;
+        }
+        #full-detail-section td,#full-detail-section tr {
+            border: 1px solid black;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+
+        #full-detail-section td:nth-child(1) {
+            font-weight: bold;
+            background-color: #ddd;
+            width: 20%;
+        }
+
+        #full-detail-section td:nth-child(2) {
+            width: 80%;
+        }
+
+        #close-btn 
+        {
+            position: absolute ;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            background-color: lightgray;
+            width: 60px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #close-btn:hover 
+        {
+            background-color: gray;
+            color: white;
+        }
+
 
         @media screen and (max-width: 768px) {
             
@@ -208,6 +261,40 @@ include "admin_only_validation.php";
 
     </section>
 
+    <section id="full-detail-section">
+        <button id="close-btn" onclick="$('#full-detail-section').hide()">&times;</button>
+
+        <table>
+            <tbody id="full-detail-tbody">
+                <tr>
+                    <td>Enquiry ID</td>
+                    <td id="detail-enquiry-id"></td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td id="detail-name"></td>
+                </tr>
+                <tr>
+                    <td>Email ID</td>
+                    <td id="detail-email-id"></td>
+                </tr>
+                <tr>
+                    <td>Mobile Number</td>
+                    <td id="detail-mobile-number"></td>
+                </tr>
+                <tr>
+                    <td>Message</td>
+                    <td id="detail-message"></td>
+                </tr>
+                <tr>
+                    <td>Enquiry Date</td>
+                    <td id="detail-enquiry-date"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </section>  
+
 
 
 
@@ -218,6 +305,7 @@ include "admin_only_validation.php";
     <script>
     $(document).ready(function() {
 
+        $('#full-detail-section').hide();
         // Fetch and display enquiries
         function loadEnquiries() {
             $.ajax({
@@ -295,6 +383,36 @@ include "admin_only_validation.php";
                     }
                 });
             }
+        });
+
+        // view button click
+        $(document).on("click", ".view-btn", function() {
+            const enquiryId = $(this).data("id");
+            const button = $(this);
+
+            $.ajax({
+                url: "get_enquiry_details.php",
+                method: "POST",
+                data: { enquiry_id: enquiryId },
+                dataType: "json",
+                success: function(data) {
+                    // Populate the detail section
+                    console.log(data)
+                    $("#detail-enquiry-id").text(data.enquiry_id);
+                    $("#detail-name").text(data.name);
+                    $("#detail-email-id").text(data.email_id);
+                    $("#detail-mobile-number").text(data.mobile_number);
+                    $("#detail-message").text(data.message);
+                    $("#detail-enquiry-date").text(data.enquiry_date);
+
+                    // Show the detail section
+                    $("#full-detail-section").show();
+                },
+                error: function(xhr, status, error) {
+                    alert("Error fetching enquiry details."+xhr.status+" "+status+" "+error);
+                }
+            });
+            
         });
 
 
