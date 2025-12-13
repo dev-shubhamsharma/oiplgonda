@@ -131,10 +131,31 @@ if ($_SESSION['user_email_id'] == $admin_email) {
         }
 
         @media (max-width: 600px) {
-            h1 {
-                font-size: 1.5rem;
+            header {
+                padding: 10px 20px;
+                flex-direction: column;
+                gap: 10px;
+                /* padding: 10px 0px; */
+                
             }
+            
+            #logo {
+                justify-self: center;
+                text-align: center;
+
+            }
+
+            h1 {
+                font-size: 1.7rem;
+
+            }
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                padding-bottom: 50px;
         }
+    }
     </style>
 </head>
 <body>

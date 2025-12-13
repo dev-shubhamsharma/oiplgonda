@@ -279,6 +279,32 @@ $conn->close();
             user-select: none;
         }
 
+        @media screen and (max-width: 500px) {
+            main {
+                width: 94%;
+                top: 30px;
+
+                /* height: 95vh; */
+            }
+
+            #title-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            /* put the timer first and prev and next button in a row */
+
+            .button-container {
+                flex-direction:column-reverse;
+               gap: 10px;
+                align-items: center;
+            }
+            
+        }
+
+
+
 
     </style>
 

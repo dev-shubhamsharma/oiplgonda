@@ -258,6 +258,45 @@ save_user_for_ranking($conn, $user_id, $user_name, $subject_name, $total_attempt
         background: linear-gradient(to left, #332dec, #17138fff)
     }
 
+    @media screen and (max-width: 500px) {
+
+        body {
+            padding: 30px;
+            display: block;
+        }
+
+        main {
+            /* margin: 30px auto; */
+            flex-direction: column;
+            height: auto;
+            width: 100%;
+            margin: 0px;
+            font-size: 1.2rem;
+            /* border: 1px solid red; */
+        }
+
+        .left-section, .right-section {
+            width: 100%;
+            height: 490px;
+            border-radius: 20px;
+        }
+
+        h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .right-section {
+            padding: 30px;
+            gap: 20px;
+        }
+
+        button#continue-btn {
+            margin-bottom: 30px;
+        }
+
+    }
+
 
 
 

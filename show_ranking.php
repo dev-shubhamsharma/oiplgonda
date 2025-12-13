@@ -7,7 +7,6 @@
     $stmt->execute();
     $result = $stmt->get_result();
     
-    
 
     session_start();
 
@@ -107,6 +106,52 @@
             border-radius: 50%;
         }
 
+
+        @media screen and (max-width: 600px) {
+            header {
+                flex-direction: column-reverse;
+                align-items: center;
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .box {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                padding: 5px;
+                /* margin: 0px; */
+                /* border: 1px solid red; */
+            }
+
+            #button-section {
+                flex-direction: column;
+                align-items: center;
+                /* border: 1px solid green; */
+                margin: 20px 10px;
+            }
+
+
+            label, input, select {
+                margin: 0px;
+            }
+
+            /* make table responsive for mobile */
+
+            #rank-table-container {
+                overflow-x: auto;
+            }
+
+            #rank-table {
+                font-size: 18px;
+                width: 100%;
+                
+            }
+        }
+
         
 
     </style>
@@ -117,11 +162,11 @@
         <a href="admin_dashboard.php">
             <button class="button">&LeftArrow; Back</button>
         </a>
-        <h1 id="heading">All Student Ranking</h1>
+        <h1 id="heading">Student Ranking</h1>
 
-        <a href="logout.php">
+        <!-- <a href="logout.php">
             <button class="button">Logout</button>
-        </a>
+        </a> -->
     </header>
     
     <div id="button-section">

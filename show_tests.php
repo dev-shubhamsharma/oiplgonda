@@ -142,7 +142,18 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             
             
             #heading {
-                font-size: 1.5rem;
+                font-size: 1.7rem;
+            }
+
+            header {
+                flex-direction: column-reverse;
+                gap: 10px;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+                padding-bottom: 50px;
             }
 
         }
@@ -157,9 +168,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             <button class="button">&LeftArrow; Back</button>
         </a>
         <h1 id="heading">Mock Tests</h1>
-        <a href="logout.php">
+        <!-- <a href="logout.php">
             <button class="button">Logout</button>
-        </a>
+        </a> -->
     </header>
 
     <section class="buttons-container">
