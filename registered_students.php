@@ -107,11 +107,11 @@
         }
 
         td:nth-child(1), th:nth-child(1) {
-            width: 12%;
+            width: 8%;
         }
 
         td:nth-child(2), th:nth-child(2) {
-            width: 20%;
+            width: 15%;
         }
 
         td:nth-child(3), th:nth-child(3) {
@@ -119,7 +119,7 @@
         }
 
         td:nth-child(4), th:nth-child(4) {
-            width: 25%;
+            width: 20%;
         }
 
         td:nth-child(5), th:nth-child(5) {
@@ -132,6 +132,31 @@
             text-align: left;
         }
 
+        .fa-trash {
+            background-color: red;
+            border: none;
+            cursor: pointer;
+            padding : 6px 12px;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .fa-trash:hover {
+            background-color: darkred;
+        }
+
+        .verify-btn {
+            background-color: green; 
+            border: none;
+            cursor: pointer;
+            padding : 6px 12px;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .verify-btn:hover {
+            background-color: darkgreen; 
+        }
 
         @media screen and (max-width: 768px) {
             
@@ -193,7 +218,8 @@
                     <th>Email Id</th>
                     <th>Verified</th>
                     <th>DateTime</th>
-                    <th>Action</th>
+                    <th>Verify</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody id="students-tbody">
@@ -227,12 +253,17 @@
 
                         let button = "";
 
+                        // if verification_status is 0, show verify and delete buttons
                         if (student.verification_status == 0) {
-                        button = `<button class="verify-btn" data-id="${student.student_id}" 
-                                    style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                                    Verify</button>`;
-                        } else {
-                            button = `<span style="color:gray;">Verified</span>`;
+                        verifyButton = `<button class="verify-btn" data-id="${student.student_id}">Verify</button>`;
+
+                        deleteButton = `<button class="fa fa-trash" data-id="${student.student_id}"></button>`;
+
+                        } 
+                        // ohterwise show only gray "Verified" text and delete button
+                        else {
+                            verifyButton = `<span style="color:gray;">Verified</span>`;
+                            deleteButton = `<button class="fa fa-trash" data-id="${student.student_id}"></button>`;
                         }
 
                         rows += `
@@ -243,7 +274,8 @@
                                 <td>${student.email_id}</td>
                                 <td style="color:${color}">${verified}</td>
                                 <td>${student.date_time}</td>
-                                <td>${button}</td>
+                                <td>${verifyButton}</td>
+                                <td>${deleteButton}</td>
                             </tr>
                         `;
                     });
@@ -274,6 +306,32 @@
                             loadStudents(); // Refresh table
                         } else {
                             alert("Error verifying student.");
+                        }
+                    },
+                    error: function() {
+                        alert("AJAX request failed.");
+                    }
+                });
+            }
+        });
+
+
+        // Delete button click
+        $(document).on("click", ".fa-trash", function() {
+            const studentId = $(this).data("id");
+            const button = $(this);
+
+            if (confirm("Are you sure you want to delete this student?")) {
+                $.ajax({
+                    url: "delete_student.php",
+                    method: "POST",
+                    data: { student_id: studentId },
+                    success: function(response) {
+                        if (response.trim() === "success") {
+                            alert("Student deleted successfully!");
+                            loadStudents(); // Refresh table
+                        } else {
+                            alert("Error deleting student.");
                         }
                     },
                     error: function() {
