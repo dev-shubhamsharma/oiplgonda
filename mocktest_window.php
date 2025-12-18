@@ -1,117 +1,3 @@
-<?php 
-session_start();
-
-if(!isset($_SESSION["user_id"]) || !isset($_SESSION["user_name"]) || !isset($_SESSION['user_email_id']))
-{
-    header("Location: login.php");
-    exit();
-}
-
-
-
-
-if(!isset($_SESSION["testname"]) || !isset($_SESSION["subject_name"]))
-{
-    header("Location: student_dashboard.php");
-    exit();
-}
-
-if(!isset($_SESSION['test_start_time'])) {
-    $_SESSION['test_start_time'] = time(); // store timestamp when test starts
-}
-
-$total_duration_seconds = $_SESSION["total_duration_in_minutes"] * 60;
-$time_elapsed = time() - $_SESSION['test_start_time'];
-$time_left = $total_duration_seconds - $time_elapsed;
-
-if ($time_left < 0) {
-    $time_left = 0; // test time over
-}
-
-
-
-
-
-
-// echo $_SESSION["testname"];
-
-$testname = $_SESSION["testname"];
-// echo $testname;
-// Mapping for show test_title on top according to testname
-
-$test_title = null;
-
-if($testname == "it_tools")
-    $test_title = "IT Tools and Networking";
-else if($testname == "web_design")
-    $test_title = "Web Designing and Publishing";
-else if($testname == "python")
-    $test_title = "Programming using Python";
-else if($testname == "iot")
-    $test_title = "Internet of Things - IoT";
-
-
-$user_id = $_SESSION["user_id"];
-$user_name = $_SESSION["user_name"];
-
-// fetch question_ids from questions_table with selected subject
-$subject_name = $_SESSION["subject_name"];
-// echo $subject_name;
-
-
-include "connection.php";
-
-$query = "select question_id from questions_table where subject_name = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param('s',$subject_name);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$question_ids = [];
-while($row = $result->fetch_assoc())
-{
-    array_push($question_ids, $row["question_id"]); 
-}
-
-// all question_id is contained in an array
-$_SESSION["question_ids"] = $question_ids;
-$_SESSION["current_question_index"] = 0;  
-// print_r($question_ids);
-$last_question_index = count($question_ids)-1;
-// echo $last_question_index;
-
-
-// create rows with user_id and question_id in mocktest_answers table for updating answers
-// question id is stored in an array $question_ids
-
-$check_query = "select * from mocktest_answers where user_id=? and subject_name=? and question_id= ?";
-foreach($question_ids as $question_id) {
-    $check_stmt = $conn->prepare($check_query);
-    $check_stmt->bind_param('isi',$user_id, $subject_name, $question_id);
-    $check_stmt->execute();
-    $result = $check_stmt->get_result();
-    if($result->num_rows == 0)
-    {
-        // insert user_id and question_id if not previously exist
-
-        $insert_query = "insert into mocktest_answers(user_id, subject_name, question_id) values (?,?,?)";
-
-        $insert_stmt = $conn->prepare($insert_query);
-        $insert_stmt->bind_param('isi',$user_id, $subject_name, $question_id);
-        $insert_stmt->execute();
-    }
-}
-
-// $insert_stmt->close();
-$check_stmt->close();
-$conn->close();
-
-
-?>
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -120,190 +6,154 @@ $conn->close();
     <title>Mocktest | OIPL</title>
 
     <?php
-        include "libs/google-font.php";
-        include "libs/font-awesome.php";
+
         include "libs/jquery.php";
-
-
+        include "libs/font-awesome.php";    
+        include "libs/google-font.php";
     ?>
-
 
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        #top {
-            height: 120px;
-            background-color: #6e6e6eff;
-        }
-
-        #bottom {
-            height: calc(100vh - 120px);
-            background-color: #b8b9bdff;
+        body {
+            background: linear-gradient(to right, #1488CC, #2B32B2);
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
         }
 
         main {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            /* height: calc(100vh - 120px); */
-            background-color: #ffffff;
+            width: 70%;
+            background-color: white;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            overflow: hidden;
+            font-size: 1.2rem;
+            color: #555;
         }
 
         #title-container {
-            text-align: center;
-            margin-bottom: 20px;
-            background-color: #064264ff;
-            /* border-radius: 5px; */
-            
-            padding: 10px 20px;
-            color: #fff;
-            width: 100%;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #aaa;
+            padding: 10px 30px;
         }
 
-        .question-container {
-            font-size: 1.2em;
-            border-bottom: 2px solid #ccc;
-            padding: 20px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
+
+        #question-section {
+            padding: 0 30px;
         }
+
+        #bottom-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            border-top: 2px solid #aaa;
+            padding: 20px 30px;
+        }
+
+        #save-next-btn {
+            padding: 10px 20px;
+            background-color: #007bffff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #save-next-btn:hover {
+            background-color: #005bb5ff;
+        }
+
+
 
         .option-container {
-            font-size: 1em;
-            border-bottom: 1px solid #ccc;
-            padding:20px;
-            display: flex;
-            align-items: center;
+            display: block;
+            border: 2px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
             cursor: pointer;
+            transition: background-color 0.1s ease, border-color 0.1s ease;
         }
 
         .option-container:hover {
-            background-color: #f0f0f0;
+            background-color: #cdcfd1ff;
+            border-color: #787b7eff;
         }
 
+        /* .option-container:hover {
+            background-color: lightgreen;
+            border-color: #12800eff;
+        } */
 
         input[type="radio"] {
-            margin-right: 10px;
-            width: 25px;
-            height: 25px;
-            /* margin-top: 4px; */
+            display: none;
         }
 
-        input[type="radio"]:checked ~ p{
-            color:green;
-            font-weight: bold;
+        input[type="radio"]:checked + label {
+            /* font-weight: 600; */
+            background: lightgreen;
+            border-color: #12800eff;
         }
 
-        .option-container label {
-            margin-top: -3px;
+        #question {
+            margin: 15px 0;
+            font-weight: 500;
+            color: #222;
         }
 
-
-        .button-container {
-            margin-top: auto;
-
-            padding: 20px;
-            text-align: center;
-            border-top: 2px solid #ccc;
-            display: flex;
-            flex-direction: row ;
-            justify-content: space-between;
-            align-items: center;
-            /* justify-self: flex-end; */
+        #question-text {
+            text-align: justify;
         }
 
-        button {
-            background-color: #32477cff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
+        #option1-text, #option2-text, #option3-text, #option4-text {
+            /* margin-left: 10px; */
+            color:#222;
         }
 
-        button:disabled {
-            background-color: #999;
-            cursor: not-allowed;
-        }
-
-        #end-test-button {
-            background-color: #e53935;
+        #timer {
+            padding: 5px 10px;
+            background-color: rgba(206, 17, 17, 0.27);
+            border-radius: 6px;
+            color: darkred;
         }
 
 
-        #overlay {
-            height: 100vh;
-            width: 100vw;
-            background-color: rgba(255, 255, 255,0.7);
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        #timer-text {
-            color: red;
-        }
-
-        
-
-
-        /* to prevent selection of text */
-
-        p,label,button,h1,h2 {
-            user-select: none;
-        }
-
-        @media screen and (max-width: 500px) {
+        @media (max-width: 600px) {
             main {
-                width: 94%;
-                top: 30px;
-
-                /* height: 95vh; */
+                width: 90%;
+                font-size: 1rem;
+                margin: 50px 0;
+                min-height: auto;
+                height: auto;
             }
 
             #title-container {
                 flex-direction: column;
-                gap: 10px;
-                padding: 15px;
-            }
-
-            /* put the timer first and prev and next button in a row */
-
-            .button-container {
-                flex-direction:column-reverse;
-               gap: 10px;
                 align-items: center;
+                gap: 10px;
             }
-            
+
+            #bottom-container {
+                flex-direction: column-reverse;
+                align-items: center;
+                gap: 10px;
+            }
+
+            #save-next-btn {
+                width: 100%;
+            }
         }
-
-
+        
 
 
     </style>
@@ -312,385 +162,52 @@ $conn->close();
 </head>
 <body>
 
-
-    <section id="top">
-
-    </section>    
-
-    <section id="bottom">
-
-    </section>
-
     <main>
 
         <div id="title-container">
-            <h2 id="test-title">
-                <?php echo $test_title; ?>
-            </h2>
+            <h2 id="title-text">IT Tools and Network</h2>
+            <h3 style="color:green;">Score : <span id="score">00</span></h3>
+            <p id="timer">Time left : <span id="time-left">80</span></p>
+        </div>
 
+        <section id="question-section">
 
+            <p id="question">
+                <span id="question-count">1.</span>
+                <span id="question-text">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat enim facilis id vero quis ipsa. Minus blanditiis accusantium voluptas magnam quaerat quisquam nesciunt, dolorem impedit, molestias incidunt deleniti optio ipsam!Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</span>
+            </p>
+
+            <input type="radio" name="option" id="option1" value="">
+            <label for="option1" class="option-container" id="option1-text">
+                Option 1
+            </label>
+
+            <input type="radio" name="option" id="option2" value="">
+            <label for="option2" class="option-container" id="option2-text">
+                Option 2
+            </label>
+
+            <input type="radio" name="option" id="option3" value="">
+            <label for="option3" class="option-container" id="option3-text">
+                Option 3
+            </label>
+
+            <input type="radio" name="option" id="option4" value="">
+            <label for="option4" class="option-container" id="option4-text">
+                Option 4
+            </label>
+                
+        </section>
+
+        <div id="bottom-container">
             <p>
-                Name :
-                <?php echo $user_name;?> 
+                Question <span id="question-count">1</span> of <span id="total-questions">10</span>
             </p>
+            <button id="save-next-btn">Save & Next</button>
         </div>
-
-        <div class="question-container">
-            <p id="question-text"> What is IoT?</p>
-        </div>
-
-        <label for="a">
-        <div class="option-container" id="option_a">
-            <input type="radio" name="option" id="a" value="">
-            <p id="option_a_label">Internet of Things is a network of physical objects</p>
-        </div>
-        </label>
-
-        <label for="b">
-        <div class="option-container" id="option_b">
-            <input type="radio" name="option" id="b" value="">
-            <p id="option_b_label">Internet of Things is a programming language</p>
-        </div>
-        </label>
-
-        <label for="c">
-        <div class="option-container" id="option_c">
-            <input type="radio" name="option" id="c" value="">
-            <p id="option_c_label">Internet of Things is a type of software</p>
-        </div>
-        </label>
-
-        <label for="d">
-        <div class="option-container" id="option_d">
-            <input type="radio" name="option" id="d" value="">
-            <p id="option_d_label">Internet of Things is a database system</p>
-        </div>
-        </label>
-
-        <div class="button-container">
-            <button id="prev-button">
-                Previous
-            </button>
-            <p id="timer-text">
-                Time left : 
-                <span id="time-left">
-                    <span id="minutes">00</span>
-                    :
-                    <span id="seconds">60</span>
-
-                </span>
-            </p>
-            <button id="next-button">
-                Save & Next&nbsp;
-            </button>
-
-            <button id="end-test-button">
-                End Test
-            </button>
-
-        </div>
-
-        
 
     </main>
-
-    <div id="overlay">
-        
-        <h2>Test Submitted</h2>
-        <p style="color:green;">Your answers have been saved successfully.</p>
-        <!-- <button id="go-dashboard-btn">
-             Go to Dashboard
-        </button> -->
-
-    </div>
-
-    <script>
-        $('document').ready(function(){
-
-            // hide overlay message
-            $("#overlay").hide();
-            $('#end-test-button').hide();
-            $('#prev-button').prop('disabled',true);
-
-            $(document).on("contextmenu", function (e) {
-                alert("Right-click is disabled during the mocktest.");
-                return false;
-            });
-
-
-            loadNextQuestion();
-
-            
-
-        });
-
-
-
-
-        // detect browser tab switching 
-        // tabSwitchingCount = 3;
-        // $(document).on("visibilitychange", function () {
-        //     if (document.hidden) {
-        //         alert("Tab switchig restricted, Exam will be auto submitted");
-        //         tabSwitchingCount--;
-
-        //         if(tabSwitchingCount == 0)
-        //         {
-        //             alert("Mocktest ended");
-        //             finishTest();
-        //         }
-                    
-        //         // You can log or submit exam here
-        //     }
-        // });
-
-        timer = null;
-        function startTimer()
-        {
-            minutes = <?php echo $_SESSION["total_duration_in_minutes"]-1; ?> ;
-            $("#minutes").html(minutes);
-            seconds = 60;
-            timer = setInterval(function(){
-
-                
-                seconds--;
-                $("#seconds").html(seconds);
-                console.log(seconds);
-                if(seconds == 0)
-                {
-                    minutes--;
-                    $("#minutes").html(minutes);
-                    seconds = 59;
-                    if(minutes == 0)
-                    {
-                        clearInterval(timer);
-                        alert("Time ended! Submitting your Test");
-                        finishTest();
-                        
-                    }
-                }
-
-            },1000);
-        }
-
-
-        var timerStarted = false;
-        function loadNextQuestion() 
-        {
-            
-            $.ajax({
-                type:"POST",
-                url:"load_next_question.php",
-                dataType: 'json',
-                success: function(response){
-                    console.log(response);
-                    
-                    $("#question-text").html("Q"+(response.current_question_index+1)+". "+response.question);
-                    $("#option_a_label").html(response.option_a);
-                    $("#a").val(response.option_a);
-                    $("#option_b_label").html(response.option_b);
-                    $("#b").val(response.option_b);
-                    $("#option_c_label").html(response.option_c);
-                    $("#c").val(response.option_c);
-                    $("#option_d_label").html(response.option_d);
-                    $("#d").val(response.option_d);
-
-
-                    loadSavedAnswer();
-                    
-                    // ⭐ Start timer only on first question
-                    if (!timerStarted) {
-                        startTimer();
-                        timerStarted = true;
-                    }
-
-                    // console.log(response.current_question_index);
-                    if(response.current_question_index == <?php echo $last_question_index; ?>)
-                    {
-                        $("#next-button").prop("disabled",true);
-                        $("#next-button").hide();
-                        $("#end-test-button").show();
-
-                    }
-                    else 
-                    {
-                        $("#next-button").prop("disabled",false);
-                        $("#next-button").show();
-                        $("#end-test-button").hide();
-                    }
-                        
-
-                },
-                error: function(xhr,status,error) {
-                    console.log(xhr,status,error);
-
-                }
-            });
-        }
-
-
-        function finishTest() 
-        {
-            console.log("Finish test");
-            clearInterval(timer);
-            // $("button").prop("disabled",true);
-            $("#overlay").show();
-            window.location.href = "mocktest_result.php";
-        }
-
-
-
-
-        $("#end-test-button").click(function(){
-            if($("input[type='radio']:checked").length === 0) {
-                alert("Please select an option");
-            }
-            else {
-                let selectedAnswer = $("input[type='radio']:checked").val();
-                console.log(selectedAnswer);
-                
-                // update answer into database
-                $.ajax({
-                    type:'POST',
-                    url:'save_selected_answer.php',
-                    data:{selected_answer:selectedAnswer},
-                    dataType: 'json',
-                    success:function(response){
-                        console.log(response);
-                        res = confirm("Do you want to submit test?");
-                        if(res) 
-                        {
-                            finishTest();
-                        }
-                        
-                        // loadNextQuestion();
-                        // $("#prev-button").prop("disabled",false);
-                    },
-                    error:function(xhr,status,error){
-                        console.log(xhr,status,error);
-                    }
-      
-
-                });
-
-
-
-            } 
-        });
-
-
-
-
-        $("#next-button").click(function(){
-            if($("input[type='radio']:checked").length === 0) {
-                alert("Please select an option");
-            }
-            else {
-                let selectedAnswer = $("input[type='radio']:checked").val();
-                console.log(selectedAnswer);
-                
-                // update answer into database
-                $.ajax({
-                    type:'POST',
-                    url:'save_selected_answer.php',
-                    data:{selected_answer:selectedAnswer},
-                    dataType: 'json',
-                    success:function(response){
-                        console.log(response);
-                        loadNextQuestion();
-                        $("#prev-button").prop("disabled",false);
-
-                    },
-                    error:function(xhr,status,error){
-                        console.log(xhr,status,error);
-                    }
-      
-
-                });
-
-
-
-            } 
-        });
-
-
-        $("#prev-button").click(function(){
-            // decrement current question index only and load question
-            $.ajax({
-                type:'POST',
-                url:'decrement_current_index.php',
-                success:function(response){
-                    console.log("current index is "+response);
-                    loadNextQuestion();
-                    if(response == 0)
-                        $("#prev-button").prop("disabled",true);
-
-                },
-                error:function(xhr,status,error){
-                    console.log(xhr,status,error);
-                }
-    
-
-            });
-
-        }); 
-
-
-
-
-        function loadSavedAnswer() {
-            $.ajax({
-                type:'POST',
-                url:'load_saved_answer.php',
-                dataType: 'json',
-                success:function(response){
-                    console.log(response);
-                    if ($('#a').val() === response) {
-                        $('#a').prop('checked', true);
-                    } else if ($('#b').val() === response) {
-                        $('#b').prop('checked', true);
-                    } else if ($('#c').val() === response) {
-                        $('#c').prop('checked', true);
-                    } else if ($('#d').val() === response) {
-                        $('#d').prop('checked', true);
-                    }
-                    else {
-                        console.log("response not matched with any option")
-                        $("input[name='option']").prop('checked',false);
-                    }
-                },
-                error:function(xhr,status,error){
-                    console.log(xhr,status,error);
-                }
-            });
-        }
-
-
-        let timeLeft = <?php echo $time_left; ?>; // time left in seconds
-
-        function startTimer() {
-            timer = setInterval(function() {
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-
-                $("#minutes").html(minutes.toString().padStart(2, '0'));
-                $("#seconds").html(seconds.toString().padStart(2, '0'));
-
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    alert("Time ended! Submitting your Test");
-                    finishTest();
-                }
-
-                timeLeft--;
-            }, 1000);
-        }
-
-
-
-
-
-    </script>
 
 </body>
 </html>
