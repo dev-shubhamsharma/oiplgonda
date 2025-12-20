@@ -5,9 +5,12 @@ session_start();
 $testname = $_GET["testname"];
 
 
-$total_questions = 0;
-$total_duration_in_minutes = 0;
+$total_questions = 5;
+$total_duration_in_minutes = $total_questions * 0.5;
 
+$_SESSION["total_questions"] = $total_questions;
+$_SESSION["total_duration_in_minutes"] = $total_duration_in_minutes;
+$_SESSION["total_duration_in_seconds"] = $total_questions * 30;
 
 // mapping of testname to database subject name
 if($testname == "it_tools")
@@ -23,30 +26,28 @@ else {
 }
 
 $_SESSION["testname"] = $testname;
-// echo $testname;
-// echo $_SESSION["testname"];
 $_SESSION["subject_name"] = $subject_name;
 
 // echo $testname ;
 // echo $subject_name;
 
 include "connection.php";
+// select random 5 question id from database based on subject name
+// array should not repeat question ids
 
-$query = "select COUNT(*) as total_rows from questions_table where subject_name = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param('s',$subject_name);
+$sql_query = "SELECT question_id FROM questions_table WHERE subject_name = ? ORDER BY RAND() LIMIT $total_questions";
+$stmt = $conn->prepare($sql_query);
+$stmt->bind_param('s', $subject_name);
 $stmt->execute();
 $result = $stmt->get_result();
-$row = $result->fetch_assoc();
+$question_ids = array();
+while ($row = $result->fetch_assoc()) {
+    $question_ids[] = $row['question_id'];
+}   
 
-$total_questions = $row['total_rows'];
-
-// set into session to access on other page 
-
-$_SESSION["total_questions"] = $total_questions;
-$_SESSION["total_duration_in_minutes"] = $total_questions * 0.5;
-// echo $total_questions;
-
+// store question ids in session
+$_SESSION["question_ids"] = $question_ids;
+// echo implode(",", $question_ids); 
 
 
 $conn->close();
@@ -138,13 +139,17 @@ $conn->close();
         </li>
         <li>Time Duration: 
             <?php 
-            echo $_SESSION["total_duration_in_minutes"] ;
+            echo $total_duration_in_minutes;
             ?>    
             minutes
         </li>
         <li>Each question carries 1 mark</li>
         <li>No negative marking for wrong answers</li>
         <li>Do not refresh the page during the test</li>
+        <li>Right Mouse click is not allowed</li>
+        <li>Do not use any external resources during the test</li>
+        <li>Tab change is not allowed</li>
+        <li>Once answer is submitted, it cannot be changed or viewed</li>
     </ul>
 
     <h2>
