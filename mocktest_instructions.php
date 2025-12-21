@@ -12,6 +12,12 @@ $_SESSION["total_questions"] = $total_questions;
 $_SESSION["total_duration_in_minutes"] = $total_duration_in_minutes;
 $_SESSION["total_duration_in_seconds"] = $total_questions * 30;
 
+$currentQuestionIndex = 0;
+
+$_SESSION["current_question_index"] = $currentQuestionIndex;
+
+$_SESSION["score"] = 0;
+
 // mapping of testname to database subject name
 if($testname == "it_tools")
     $subject_name = "IT Tools";

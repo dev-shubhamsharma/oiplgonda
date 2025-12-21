@@ -35,6 +35,7 @@ if ($result->num_rows > 0) {
 
     $row["question_number"] = $_SESSION["current_question_index"];
     $row["total_questions"] = $_SESSION["total_questions"];
+    $row["score"] = $_SESSION["score"];
 
     echo json_encode($row);
 } else {

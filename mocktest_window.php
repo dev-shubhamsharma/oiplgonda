@@ -3,18 +3,14 @@
     session_start();
 
 
-    if(!isset($_SESSION["question_ids"])) {
+    if(!isset($_SESSION["question_ids"]) || !isset($_SESSION["user_id"])) {
         // redirect to test selection page
         header("Location: login.php");
         exit();
     }
 
     // print_r($_SESSION["question_ids"]);
-    $currentQuestionIndex = 0;
-
-    $_SESSION["current_question_index"] = $currentQuestionIndex;
-
-    $_SESSION["score"] = 0;
+    
 
 
 ?>
@@ -284,9 +280,7 @@
                 
             });
 
-
-            
-
+            $("#score").text(<?php echo $_SESSION["score"]; ?>);
 
 
         });
@@ -346,23 +340,36 @@
 
 
         function startTimer() {
-            var totalTimeInSeconds = <?php echo $_SESSION["total_questions"] * 30; ?>; // total time in seconds
-            var timeLeft = totalTimeInSeconds;
 
-            var timerInterval = setInterval(function() {
-                var minutes = Math.floor(timeLeft / 60);
-                var seconds = timeLeft % 60;
+            totalQuestions = <?php echo $_SESSION["total_questions"]; ?>;
+            seconds = totalQuestions * 30;
 
-                $("#time-left").text(minutes + "m " + seconds + "s");
-
-                if(timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert("Time is up! The test will be submitted automatically.");
+            timer = setInterval(function(){
+                if(seconds == 0)
+                {
+                    clearInterval(timer);
                     finishTest();
                 }
 
-                timeLeft--;
-            }, 1000);
+                $.ajax({
+                    url:'update_timer_for_mocktest.php',
+                    method:'post',
+                    dataType:'json',
+                    success:function(response){
+                        seconds = response;
+                        // console.log(response);
+                        $("#time-left").text(seconds+"s");
+                    },
+                    error:function(xhr,status,error){
+                        console.log(xhr,status,error);
+                    }
+                });
+
+            },1000);
+            
+            
+            
+            
         }
 
         function finishTest() {
@@ -390,7 +397,7 @@
                 data: {selected_answer:selectedAnswer},
                 dataType:'json',
                 success:function(response){
-                    console.log(response)
+                    console.log(response);
                     correctAnswer = response.correct_answer;
                     console.log("correct answer is : "+correctAnswer);
                     if(selectedAnswer == correctAnswer)
@@ -399,7 +406,7 @@
                         $("input[type='radio']:checked + label").addClass("correct-answer");
                         
                         // update score if answer is correct
-                        $("#score").text(parseInt($("#score").text())+1); 
+                        $("#score").text(response.score); 
 
                     }
                     else
