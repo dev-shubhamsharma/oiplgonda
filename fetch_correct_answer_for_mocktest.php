@@ -11,11 +11,11 @@ if(!isset($selected_answer)) {
     exit();
 }
 
-$question_index = $_SESSION["current_question_index"];
+$current_question_index = $_SESSION["current_question_index"];
 $question_ids = $_SESSION["question_ids"];
 include "connection.php";
 
-$current_question_id = $question_ids[$question_index];
+$current_question_id = $question_ids[$current_question_index];
 $sql_query = "SELECT correct_answer 
               FROM questions_table 
               WHERE question_id = ?";
@@ -26,9 +26,15 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
+    //increment score if answer is correct
+    if($selected_answer == $row["correct_answer"])
+        $_SESSION["score"] = $_SESSION["score"]+1;
 
-// before sending correct answer increment index for next question
-    $_SESSION["current_question_index"] = $question_index + 1;
+    // before sending correct answer increment index for next question
+    $_SESSION["current_question_index"] = $current_question_index + 1;
+
+    $row["question_number"] = $_SESSION["current_question_index"];
+    $row["total_questions"] = $_SESSION["total_questions"];
 
     echo json_encode($row);
 } else {

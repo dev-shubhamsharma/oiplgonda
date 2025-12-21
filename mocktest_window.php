@@ -1,29 +1,23 @@
-<?php
+<?php 
+
     session_start();
-    include "connection.php";
 
 
+    if(!isset($_SESSION["question_ids"])) {
+        // redirect to test selection page
+        header("Location: login.php");
+        exit();
+    }
 
-    $testname = $_SESSION["testname"];
-    $subject_name = $_SESSION["subject_name"];
-    $total_questions = $_SESSION["total_questions"];
-    $total_duration_in_minutes = $_SESSION["total_duration_in_minutes"];
-    $total_duration_in_seconds = $_SESSION["total_duration_in_seconds"];
-    $question_ids = $_SESSION["question_ids"];
-    echo implode(",", $question_ids);
-    echo "Total Seconds".$total_duration_in_seconds;
+    // print_r($_SESSION["question_ids"]);
+    $currentQuestionIndex = 0;
 
-    $_SESSION["current_question_index"] = 0;
-    $current_question_index = $_SESSION["current_question_index"];
-    
+    $_SESSION["current_question_index"] = $currentQuestionIndex;
 
-    $_SESSION["current_score"] = 0;
+    $_SESSION["score"] = 0;
+
 
 ?>
-
-
-
-
 
 
 <!DOCTYPE html>
@@ -56,10 +50,11 @@
             background: linear-gradient(to right, #1488CC, #2B32B2);
             display: grid;
             place-items: center;
-            /* min-height: 100vh; */
+            min-height: 100vh;
         }
 
         main {
+            /* margin-top: 40px; */
             width: 70%;
             background-color: white;
             box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
@@ -105,6 +100,25 @@
             background-color: #005bb5ff;
         }
 
+        #save-next-btn:disabled {
+            background-color: #666;
+            cursor:not-allowed;
+        }
+
+        .finish-btn {
+            padding: 10px 20px;
+            background-color: #db3e3eff !important;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #finish-btn:hover {
+            background-color: #b31b1bff;
+        }
+
 
 
         .option-container {
@@ -118,8 +132,8 @@
         }
 
         .option-container:hover {
-            background-color: #cdcfd1ff;
-            border-color: #787b7eff;
+            background-color: #79afe6f1;
+            border-color: #0a3d70ff;
         }
 
         /* .option-container:hover {
@@ -131,6 +145,10 @@
             display: none;
         }
 
+        input[type='radio']:checked + label {
+            background: lightgreen ;
+            border-color: #12800eff ;
+        }
 
 
         .selected-answer,.correct-answer {
@@ -165,6 +183,7 @@
             border-radius: 6px;
             color: darkred;
         }
+
 
 
         @media (max-width: 600px) {
@@ -241,92 +260,32 @@
 
         <div id="bottom-container">
             <p>
-                Question <span id="question-progress">0.</span> 
-                of <span id="total-questions"><?php echo $total_questions; ?></span>
+                Question <span id="question-progress">0</span> 
+                of <span id="total-questions">0</span>
             </p>
             <button id="save-next-btn">Save & Next</button>
         </div>
 
     </main>
 
-
-
     <script>
 
         $(document).ready(function(){
+            //  disable save btn until question does not load
+            $("#save-next-btn").prop("disabled","true");
 
-            // load first question and start timer
             loadQuestion();
-            // startTimer();
-            
-            $(".option-container").click(function(){
-                $(".option-container").removeClass("selected-answer");
-                $(this).addClass("selected-answer");
-
-            });
-
+            startTimer();
 
             $("#save-next-btn").click(function(){
+                // disable button until answer is not checked
+                $("#save-next-btn").prop("disabled","true");
+                saveAndNext();
                 
-                let selected_answer = $("input[name='option']:checked").val();
-                console.log("Selected Answer: ", selected_answer);
-                if(!selected_answer){
-                    alert("Please select an answer before proceeding.");
-                    return;
-                }
-
-                $.ajax({
-                    url: 'fetch_correct_answer_for_mocktest.php',
-                    method: 'POST',
-                    data: { selected_answer: selected_answer },
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log(response);
-                        if(response.error){
-                            alert(response.error);
-                        } else {
-                            let correct_answer = response.correct_answer;
-                            if(selected_answer === correct_answer){
-                                console.log("Correct Answer!");
-                                $(".selected-answer").addClass("correct-answer");
-                                // Increment score logic here
-                                $("#score").text( parseInt($("#score").text()) + 1 );
-                            } else {
-                                $(".selected-answer").addClass("wrong-answer");
-                                // Highlight correct answer
-                                $("input[value='" + correct_answer + "'] + .option-container").addClass("correct-answer");
-                            }
-
-                            setTimeout(function(){
-                                // Load next question
-                                if(parseInt($("#question-progress").text()) >= <?php echo $total_questions; ?>){
-                                    // alert("Mock Test Completed! Your final score is: " + $("#score").text());
-                                    // go to certificate page
-                                    $(location).attr('href', 'mocktest_certificate.php');
-                                    
-                                    // return;
-                                }
-
-                                loadQuestion();
-                                clearSelectionAndHighlights();
-                            }, 1000);
-                            
-                            // Load next question logic here
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error fetching correct answer:", error);
-                    }
-                });
-
             });
 
 
-            // clear selection and highlights when loading new question
-            function clearSelectionAndHighlights(){
-                $("input[name='option']").prop('checked', false);
-                $(".option-container").removeClass("selected-answer correct-answer wrong-answer");
-            }
+            
 
 
 
@@ -334,20 +293,22 @@
 
 
 
-
-
-
-        function loadQuestion(){
-            // Load question logic here
+        function loadQuestion() {
             $.ajax({
                 url: 'fetch_question_for_mocktest.php',
                 method: 'POST',
                 dataType: 'json',
                 success: function(response) {
+                    console.log(response);
+                    console.log("question id is : "+response.question_id);
 
-                    // console.log(response);
-                    $("#question-count").text( parseInt($("#question-count").text()) + 1 +". ");
-                    $("#question-progress").text( parseInt($("#question-progress").text()) + 1);
+                    $("#question-count").text(response.question_number+". ");
+                    $("#question-progress").text(response.question_number);
+
+                    totalQuestions = <?php echo $_SESSION["total_questions"]; ?>;
+
+                    $("#total-questions").text(totalQuestions);
+
                     $("#question-text").text(response.question);
 
                     $("#option-a").val(response.option_a);
@@ -360,44 +321,120 @@
                     $("#option-c-text").text(response.option_c);
                     $("#option-d-text").text(response.option_d);
 
-                    // after loading last question disable save & next button
-                    if(parseInt($("#question-progress").text()) >= <?php echo $total_questions; ?>){
+
+                    $("#save-next-btn").removeAttr("disabled");
+
+                    // on loading of last question finish the test
+                    if(response.question_number == totalQuestions)
+                    {
+                        console.log("Last question");
+
                         $("#save-next-btn").text("Finish Test");
+                        $("save-next-btn").addClass("finish-btn");
+
+                        // $("#save-next-btn").addClass("finish-btn");
                     }
 
 
                 },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching question:", error);
+                error: function(xhr,status,error){
+                    console.log(xhr,status,error);
                 }
             });
+
         }
 
 
+        function startTimer() {
+            var totalTimeInSeconds = <?php echo $_SESSION["total_questions"] * 30; ?>; // total time in seconds
+            var timeLeft = totalTimeInSeconds;
 
-        function startTimer(){
-            let total_seconds = <?php echo $total_duration_in_seconds; ?>;
-            let time_left = total_seconds;
+            var timerInterval = setInterval(function() {
+                var minutes = Math.floor(timeLeft / 60);
+                var seconds = timeLeft % 60;
 
-            let timer_interval = setInterval(function(){
-                if(time_left <= 0){
-                    clearInterval(timer_interval);
-                    alert("Time's up! The test will be submitted automatically.");
-                    // Here you can add code to submit the test automatically
-                } else {
-                    time_left--;
-                    $("#time-left").text(time_left + " seconds");
-                    $.ajax({
-                        url: 'update_timer.php',
-                        method: 'POST',
-                        data: { remaining_time: time_left },
-                        success: function(response) {
-                            // Timer updated successfully on the server
-                        }
-                    });
+                $("#time-left").text(minutes + "m " + seconds + "s");
+
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time is up! The test will be submitted automatically.");
+                    finishTest();
                 }
+
+                timeLeft--;
             }, 1000);
         }
+
+        function finishTest() {
+            alert("We are redirecting to result page.....")
+            window.location.href = "mocktest_certificate.php";
+        }
+
+
+
+        function saveAndNext() {
+            selectedAnswer = $("input[name='option']:checked").val();
+            console.log("Selected Answer is : "+selectedAnswer);
+
+            if(selectedAnswer == null || selectedAnswer == undefined || selectedAnswer == "") {
+                alert("Please select an answer!!");
+                // enable save and next button
+                $("#save-next-btn").removeAttr("disabled");
+                return;
+            }
+
+            // fetch correct answer from database
+            $.ajax({
+                url:'fetch_correct_answer_for_mocktest.php',
+                method:'POST',
+                data: {selected_answer:selectedAnswer},
+                dataType:'json',
+                success:function(response){
+                    console.log(response)
+                    correctAnswer = response.correct_answer;
+                    console.log("correct answer is : "+correctAnswer);
+                    if(selectedAnswer == correctAnswer)
+                    {
+                        // add correct-answer class to radio button label
+                        $("input[type='radio']:checked + label").addClass("correct-answer");
+                        
+                        // update score if answer is correct
+                        $("#score").text(parseInt($("#score").text())+1); 
+
+                    }
+                    else
+                    {
+                        // add wrong-answer class to radio button label
+                        $("input[type='radio']:checked + label").addClass("wrong-answer");
+                        $("input[value='"+correctAnswer+"'] + label").addClass("correct-answer");
+                    }
+
+                 ;   setTimeout(function(){
+                        // clear all selection and load next question 
+                        $("label").removeClass("selected-answer correct-answer wrong-answer");
+
+                        // remove selection from previous answer
+                        $("input[name='option']").prop("checked",false);
+
+                        // it last question is submitted then
+                        if(response.question_number == response.total_questions)
+                            finishTest();
+                        loadQuestion();
+                        
+                    },1500);
+
+                },
+                error:function(xhr,status,error){
+                    console.log(xhr,status,error);
+                }
+            });
+
+
+            
+
+            
+        }
+
 
 
     </script>
