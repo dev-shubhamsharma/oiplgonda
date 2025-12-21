@@ -5,18 +5,7 @@ session_start();
 $testname = $_GET["testname"];
 
 
-$total_questions = 5;
-$total_duration_in_minutes = $total_questions * 0.5;
-
-$_SESSION["total_questions"] = $total_questions;
-$_SESSION["total_duration_in_minutes"] = $total_duration_in_minutes;
-$_SESSION["total_duration_in_seconds"] = $total_questions * 30;
-
-$currentQuestionIndex = 0;
-
-$_SESSION["current_question_index"] = $currentQuestionIndex;
-
-$_SESSION["score"] = 0;
+include "connection.php";
 
 // mapping of testname to database subject name
 if($testname == "it_tools")
@@ -31,13 +20,57 @@ else {
     die("Invalid testname provided.");   // stops page and prevents SQL error
 }
 
+
 $_SESSION["testname"] = $testname;
 $_SESSION["subject_name"] = $subject_name;
+
+
+$total_questions = 0;
+
+// fetch total number of questions in database of a subject
+$count_query = "select COUNT(*) as total_questions from questions_table where subject_name = ?";
+$count_stmt = $conn->prepare($count_query);
+$count_stmt->bind_param('s', $subject_name);
+$count_stmt->execute();
+$count_result = $count_stmt->get_result();
+if ($count_result->num_rows > 0) {
+    $row = $count_result->fetch_assoc();
+    if($row['total_questions'] > 10) {
+        // max questions in mocktest
+        $total_questions = 10;
+    }
+    else {
+        $total_questions = $row['total_questions'];
+    }
+
+    
+} else {
+    die("No questions found for the selected subject.");
+}
+
+
+
+
+
+
+
+$total_duration_in_minutes = $total_questions * 0.5;
+
+$_SESSION["total_questions"] = $total_questions;
+$_SESSION["total_duration_in_minutes"] = $total_duration_in_minutes;
+$_SESSION["total_duration_in_seconds"] = $total_questions * 30;
+
+$currentQuestionIndex = 0;
+
+$_SESSION["current_question_index"] = $currentQuestionIndex;
+
+$_SESSION["score"] = 0;
+
+
 
 // echo $testname ;
 // echo $subject_name;
 
-include "connection.php";
 // select random 5 question id from database based on subject name
 // array should not repeat question ids
 
