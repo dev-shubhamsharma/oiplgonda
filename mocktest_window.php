@@ -373,8 +373,31 @@
         }
 
         function finishTest() {
-            alert("We are redirecting to result page.....")
-            window.location.href = "mocktest_certificate.php";
+            // save mocktest data before redirecting to another page
+
+            $.ajax({
+                url: 'save_mocktest_details.php',
+                method:'post',
+                dataType: 'json',
+                success: function(response){
+                    console.log(response);
+
+                    // if data saved then redirect
+                    alert("We are redirecting to result page.....")
+                    window.location.href = "mocktest_certificate.php";
+                },
+                error:function(xhr,status,error){
+                    console.log(xhr,status,error);
+                }
+
+            });
+
+
+
+
+
+
+            
         }
 
 
