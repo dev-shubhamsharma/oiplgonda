@@ -221,7 +221,7 @@
             <div class="img-wrapper">
                 <img src="images//ccc.png" alt="course image">
             </div>
-            <h3 class="course-title">Course on Computer Concept</h3>
+            <h3 class="course-title">NIELIT CCC Certificate</h3>
             <p class="duration">3 Months</p>
             <p class="level">Beginner <span class="fa fa-signal"></span></p>
             <a href="#" class="more-btn">More Details</a>

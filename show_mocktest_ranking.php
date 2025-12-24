@@ -1,26 +1,32 @@
 <?php 
 
+    session_start();
+
     include "connection.php";
 
-    $query = "select 
-                user_id,
-                user_name,
-                subject_name,
-                SUM(correctly_answered) as sum_of_correctly_answered,
-                SUM(questions_attempted) as sum_of_questions_attempted,
-                SUM(total_time_taken) as sum_of_total_time_taken,
-                datetime
-                from ranking_table group by user_id order by sum_of_correctly_answered desc, sum_of_total_time_taken asc";
-    // $query = "select * from ranking_table order by sum_of_correctly_answered desc, sum_of_total_time_taken asc";
+
+    $query = "select user_name,subject_name,
+    MAX(total_questions) as total_questions,
+    ROUND(AVG(score),2) as average_score
+    from mocktest_performance_table
+    group by user_id,subject_name 
+    order by average_score DESC";
+
     $stmt = $conn->prepare($query);
     $stmt->execute();
     $result = $stmt->get_result();
+    if($result->num_rows == 0)
+        die("No Data Found to Display");
+
+
     
 
-    session_start();
+
 
 
 ?>
+
+
 
 
 
@@ -180,7 +186,7 @@
     
     <div id="button-section">
         <div class="box">
-            <label for="rank-type">Show ranking of : </label>
+            <label for="rank-type">Ranking Subject : </label>
             <select name="rank-type" id="rank-type">
                 <option value="all">All</option>
                 <option value="IT Tools">IT Tools</option>
@@ -199,10 +205,9 @@
                     <th>Student Rank</th>
                     <th>Profile Photo</th>
                     <th>Student Name</th>
-                    <th>Attempted Questions</th>
-                    <th>Correct Answers</th>
-                    <th>Time Taken (in seconds)</th>
-                    <th>Date</th>
+                    <th>Subject Name</th>
+                    <th>Attempted Ques (Avg.)</th>
+                    <th>Correct Answers (Avg.)</th>
                 </tr>
             </thead>
             <!-- bold current user name -->
@@ -211,45 +216,49 @@
             <tbody>
                 
                 <?php
+                
                     $count = 1; 
                     while($row = $result->fetch_assoc()) {
                         echo "<script>console.log(".json_encode($row).")</script>";
 
                         // to color the row for current user
+
+                        
                         if($row['user_name'] == $_SESSION['user_name']) {
                             echo "<tr style='font-weight: bold; background-color: #3392beff;'>
                                 <td>$count</td>
                                 <td><img src=\"images/user.png\" width=\"50\" height=\"50\" class=\"profile-image\"></td>
                                 <td>".$row['user_name']."</td>
-                                <td>".$row['sum_of_questions_attempted']."</td>
-                                <td>".$row['sum_of_correctly_answered']."</td>
-                                <td>".$row['sum_of_total_time_taken']."</td>
-                                <td>".date("d-m-Y",strtotime($row['datetime']))."</td>
+                                <td>".$row['subject_name']."</td>
+                                <td>".$row['total_questions']."</td>
+                                <td>".$row['average_score']."</td>
+                                
                             </tr>";
                             $count++;
                             continue;
                         } 
                         else 
                         {
-                            echo "<tr>
+                            echo "<tr style='font-weight: bold; background-color: #3392beff;'>
                                 <td>$count</td>
                                 <td><img src=\"images/user.png\" width=\"50\" height=\"50\" class=\"profile-image\"></td>
                                 <td>".$row['user_name']."</td>
-                                <td>".$row['sum_of_questions_attempted']."</td>
-                                <td>".$row['sum_of_correctly_answered']."</td>
-                                <td>".$row['sum_of_total_time_taken']."</td>
-                                <td>".date("d-m-Y",strtotime($row['datetime']))."</td>
+                                <td>".$row['subject_name']."</td>
+                                <td>".$row['total_questions']."</td>
+                                <td>".$row['average_score']."</td>
+                                
                             </tr>";
                             $count++;
 
                         }
+                            
 
                         
                         // Process each row
                         // You can store the rows in an array or directly generate HTML here
                     }
 
-
+    
                 ?>
 
 

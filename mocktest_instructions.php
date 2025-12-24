@@ -1,6 +1,15 @@
 <?php 
+
 // set into session for access
 session_start();
+
+
+if(!isset($_SESSION["user_id"]))
+{
+    header("Location: login.php");
+    exit();
+}
+    
 
 $testname = $_GET["testname"];
 
@@ -41,11 +50,13 @@ if ($count_result->num_rows > 0) {
     }
     else {
         $total_questions = $row['total_questions'];
+        
     }
 
     
 } else {
     die("No questions found for the selected subject.");
+    exit();
 }
 
 
@@ -161,6 +172,12 @@ $conn->close();
             background-color: #1a3266ff;
         }
 
+
+        #start-test-btn:disabled {
+            background-color: #666;
+            cursor:not-allowed;
+        }
+
         #start-test-btn i {
             margin-left: 5px;
         }
@@ -208,6 +225,13 @@ $conn->close();
                 window.location.href = 'mocktest_window.php';
 
             });
+
+            if(<?php echo $total_questions ?> <= 0)
+            {
+                $("#start-test-btn").prop("disabled","true");
+            }
+
+
         });
 
     </script>

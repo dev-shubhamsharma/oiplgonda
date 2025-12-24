@@ -193,9 +193,9 @@ if ($_SESSION['user_email_id'] == $admin_email) {
                 <span>Attempt Exam</span>
             </a>
 
-            <a href="show_ranking.php" class="button-link">
+            <a href="show_mocktest_ranking.php" class="button-link">
                 <i class="fa fa-bar-chart"></i>
-                <span>Show My Rank</span>
+                <span>Show Mocktest Rank</span>
             </a>
 
 

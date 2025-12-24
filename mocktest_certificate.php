@@ -1,14 +1,17 @@
 <?php
 session_start();
 
-if(!isset($name) || !isset($testname) || !isset($score)) {
-    die("Required session data is missing.");
-}
-
 $name = $_SESSION["user_name"];
 $testname = $_SESSION["subject_name"];
 $score = $_SESSION["score"];
 $date = date("d M Y");
+
+
+
+if(!isset($name) || !isset($testname) || !isset($score)) {
+    die("Required session data is missing.");
+}
+
 
 
 

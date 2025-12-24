@@ -229,27 +229,27 @@
             <p id="question">
                 <span id="question-count">0.</span>
                 <span id="question-text">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat enim facilis id vero quis ipsa. Minus blanditiis accusantium voluptas magnam quaerat quisquam nesciunt, dolorem impedit, molestias incidunt deleniti optio ipsam!Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</span>
+                This is a Question.</span>
             </p>
 
             <input type="radio" name="option" id="option-a" value="">
             <label for="option-a" class="option-container" id="option-a-text">
-                Option 1
+                This is option A
             </label>
 
             <input type="radio" name="option" id="option-b" value="">
             <label for="option-b" class="option-container" id="option-b-text">
-                Option 2
+                This is option B
             </label>
 
             <input type="radio" name="option" id="option-c" value="">
             <label for="option-c" class="option-container" id="option-c-text">
-                Option 3
+                This is option C
             </label>
 
             <input type="radio" name="option" id="option-d" value="">
             <label for="option-d" class="option-container" id="option-d-text">
-                Option 4
+                This is option D
             </label>
                 
         </section>
