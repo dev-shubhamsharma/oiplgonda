@@ -132,8 +132,22 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
         }
 
         @media (max-width: 600px) {
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 20px;
+            }
+
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.7rem;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                padding-bottom: 50px;
             }
         }
     </style>
@@ -175,10 +189,11 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
                 <i class="fa fa-question-circle"></i>
                 <span>Manage Questions</span>
             </a>
-            <a href="site_settings.php" class="button-link">
-                <i class="fa fa-cog"></i>
-                <span>Site Settings</span>
+            <a href="show_mocktest_ranking.php" class="button-link">
+                <i class="fa fa-bar-chart"></i>
+                <span>Show Mocktest Rank</span>
             </a>
+            
         </section>
 
     </main>

@@ -107,9 +107,9 @@ if(!isset($name) || !isset($testname) || !isset($score)) {
         for successfully completing <br>the online mock test on subject
 
         <span style="font-style: italic; color: green; font-weight: bold;"><?php echo htmlspecialchars($testname); ?></span>
-        with a score of <strong><?php echo $score; ?> / <?php echo $_SESSION["total_questions"]; ?></strong> and 
-        achieved a grade of 
-        <strong>
+        with <br>a score of <strong style='color:green'><?php echo $score; ?> / <?php echo $_SESSION["total_questions"]; ?></strong> and 
+        achieved a grade of (
+        <strong style="color:green;">
             <?php
             $percentage = ($score / $_SESSION["total_questions"]) * 100;
             if ($percentage >= 85) {
@@ -128,7 +128,7 @@ if(!isset($name) || !isset($testname) || !isset($score)) {
             }
             ?>
         </strong>
-        on date <strong><?php echo $date; ?></strong>.
+        ) on date <strong><?php echo $date; ?></strong>.
 
     </p>
 

@@ -5,12 +5,9 @@
     include "connection.php";
 
 
-    $query = "select user_name,subject_name,
-    MAX(total_questions) as total_questions,
-    ROUND(AVG(score),2) as average_score
-    from mocktest_performance_table
-    group by user_id,subject_name 
-    order by average_score DESC";
+    $query = "select COUNT(user_id) as user_attempt, user_name, subject_name, MAX(total_questions) as total_questions, 
+    ROUND(AVG(score),2) as average_score from mocktest_performance_table
+    group by user_id,subject_name order by average_score DESC";
 
     $stmt = $conn->prepare($query);
     $stmt->execute();
@@ -208,6 +205,7 @@
                     <th>Subject Name</th>
                     <th>Attempted Ques (Avg.)</th>
                     <th>Correct Answers (Avg.)</th>
+                    <th>Total Attempts</th>
                 </tr>
             </thead>
             <!-- bold current user name -->
@@ -232,7 +230,7 @@
                                 <td>".$row['subject_name']."</td>
                                 <td>".$row['total_questions']."</td>
                                 <td>".$row['average_score']."</td>
-                                
+                                <td>".$row['user_attempt']."</td>
                             </tr>";
                             $count++;
                             continue;
@@ -246,6 +244,7 @@
                                 <td>".$row['subject_name']."</td>
                                 <td>".$row['total_questions']."</td>
                                 <td>".$row['average_score']."</td>
+                                <td>".$row['user_attempt']."</td>
                                 
                             </tr>";
                             $count++;
