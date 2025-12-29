@@ -94,7 +94,7 @@
         }
 
         table {
-            width: 100%;
+            /* width: 100%; */
             border-collapse: collapse;
             border: 1px solid #ccc;
             font-family: Arial, Helvetica, sans-serif;
@@ -110,19 +110,27 @@
             color: #1488CC;
         }
 
-        td:nth-child(1), th:nth-child(1) {
+        tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        td:nth-child(1) {
             width: 10%;
         }
 
-        td:nth-child(2), th:nth-child(2) {
-            width: 15%;
+        /* td:nth-child(2) {
+            width: 20%;
         }
 
-        td:nth-child(3), th:nth-child(3) {
-            width: 60%;
-        }
+        td:nth-child(3) {
+            width: 10%;
+        } */
+/* 
+        td:nth-child(4), th:nth-child(5), td:nth-child(6), th:nth-child(7), th:nth-child(8) {
+            width: 10%;
+        } */
 
-        td:nth-child(4), th:nth-child(4) {
+        td:nth-child(9) {
             width: 15%;
         }
 
@@ -195,6 +203,11 @@
                     <th>Ques.Id</th>
                     <th>Subject</th>
                     <th>Question Text</th>
+                    <th>Option A</th>
+                    <th>Option B</th>
+                    <th>Option C</th>
+                    <th>Option D</th>
+                    <th>Correct Answer</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -245,7 +258,12 @@
                             <tr>
                                 <td>${question.question_id}</td>
                                 <td>${question.subject_name}</td>
-                                <td>${question.question}</td>
+                                <td>${escapeHTML(question.question)}</td>
+                                <td>${escapeHTML(question.option_a)}</td>
+                                <td>${escapeHTML(question.option_b)}</td>
+                                <td>${escapeHTML(question.option_c)}</td>
+                                <td>${escapeHTML(question.option_d)}</td>
+                                <td>${escapeHTML(question.correct_answer)}</td>
                                 <td>${editButton} ${deleteButton}</td>
                             </tr>
                         `;
@@ -350,6 +368,14 @@
             $('#question_id').val(newQuestionId);
 
         });
+
+
+
+
+
+        function escapeHTML(str) {
+            return $("<div>").text(str).html();
+        }
 
     });
     </script>

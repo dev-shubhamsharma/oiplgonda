@@ -285,6 +285,12 @@
 
         });
 
+        // this is to convert special characters to html entities
+        function escapeHTML(str) {
+            return $("<div>").text(str).html();
+        }
+
+
 
 
         function loadQuestion() {
@@ -303,18 +309,17 @@
 
                     $("#total-questions").text(totalQuestions);
 
-                    $("#question-text").text(response.question);
+                    $("#question-text").html(escapeHTML(response.question));
 
                     $("#option-a").val(response.option_a);
                     $("#option-b").val(response.option_b);
                     $("#option-c").val(response.option_c);
                     $("#option-d").val(response.option_d);
 
-                    $("#option-a-text").text(response.option_a);
-                    $("#option-b-text").text(response.option_b);
-                    $("#option-c-text").text(response.option_c);
-                    $("#option-d-text").text(response.option_d);
-
+                    $("#option-a-text").html(escapeHTML(response.option_a));
+                    $("#option-b-text").html(escapeHTML(response.option_b));
+                    $("#option-c-text").html(escapeHTML(response.option_c));
+                    $("#option-d-text").html(escapeHTML(response.option_d));
 
                     $("#save-next-btn").removeAttr("disabled");
 
@@ -324,7 +329,7 @@
                         console.log("Last question");
 
                         $("#save-next-btn").text("Finish Test");
-                        $("save-next-btn").addClass("finish-btn");
+                        $("#save-next-btn").addClass("finish-btn");
 
                         // $("#save-next-btn").addClass("finish-btn");
                     }
