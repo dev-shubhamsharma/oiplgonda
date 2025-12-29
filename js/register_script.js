@@ -3,13 +3,13 @@ $('#register_form').submit(function(event) {
 
     event.preventDefault();
 
-    var name = $('#student_name').val();
-    var mobile_number = $('#mobile_number').val();
-    var email = $('#email_id').val(); 
-    var password = $('#password').val();
-    var confirm_password = $('#confirm_password').val();
+    var name = $('#student_name').val().trim();
+    var mobile_number = $('#mobile_number').val().trim();
+    var email = $('#email_id').val().trim(); 
+    var password = $('#password').val().trim();
+    var confirm_password = $('#confirm_password').val().trim();
 
-    // $('#success-msg').hide();
+
     $('#message-box-overlay').hide();
     $('#message-box').hide();
 

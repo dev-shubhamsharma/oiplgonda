@@ -26,6 +26,11 @@
     $confirm_password = filter_input(INPUT_POST, 'confirm_password', FILTER_UNSAFE_RAW);
 
 
+    // convert to capitalize case
+    $name = ucwords(strtolower($name));
+    $email = strtolower($email);
+
+
     // Name validation
     if (empty($name)) {
         $errors[] = "Name is required.";

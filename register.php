@@ -184,9 +184,9 @@
                 <span id="email_error">Email id should be valid</span>
             </div>
             <div class="input-container">
-                <label for="password">Password</label>
+                <label for="password">Create Password</label>
                 <input type="password" id="password" name="password" required>
-                <span id="password_error">Password lenght is short</span>
+                <span id="password_error">Password length is short</span>
             </div>
             <div class="input-container">
                 <label for="confirm_password">Confirm Password</label>

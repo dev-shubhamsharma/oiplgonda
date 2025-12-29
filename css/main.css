@@ -222,7 +222,7 @@ textarea {
 {
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.7);
     position:fixed;
     top: 0;
     left:0;
@@ -238,8 +238,9 @@ textarea {
     height: 50px;
     font-size: 30px;
     color: #fff;
-    background-color: inherit;
+    background-color: #2B32B2;
     border: 1px solid #fff;
+    cursor: pointer;
 }
 
 
@@ -295,7 +296,7 @@ textarea {
     
     footer {
         flex-direction: column-reverse;
-        padding: 40px 30px;
+        padding: 80px 30px;
     }
 
     footer .left {
