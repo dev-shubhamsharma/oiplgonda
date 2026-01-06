@@ -142,8 +142,24 @@
         }
 
         .edit-btn:hover{
-            background-color: #1488CC
+            background-color: #1488CC;
         }
+
+        .page-btn {
+            background: #3b5eb8ff;
+            padding: 5px 10px;
+            color: #eee;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0 2px;
+        }
+
+        .active-btn {
+            background-color:darkgreen;
+        }
+
+        
 
 
         @media screen and (max-width: 768px) {
@@ -184,9 +200,15 @@
     </header>
 
     <section id="button-section">
-        <input type="text" id="search-box" name="search" placeholder="Search by id or keyword..." style="width: 400px;" >
+        <input type="text" id="search-box" name="search" placeholder="Search by id or keyword..." style="width: 250px;" >
 
         <p id="entry-count">Total Entries : 0</p>
+
+        <div id="pagination">
+            <button class="page-btn active-btn" id="page-btn-1">1</button>
+            <button class="page-btn" id="page-btn-2">2</button>
+            
+        </div>
 
         <!-- Add new question  -->
         <button class="button" id="new-question-btn" style="background-color: green; margin-right: 10px;" >
@@ -234,45 +256,27 @@
                 url: "fetch_questions.php",
                 method: "GET",
                 dataType: "json",
-                success: function(data) {
-                    let rows = "";
-                    $.each(data, function(index, question) {
-                        // let verified = student.verification_status == 1 ? "Yes" : "No";
-                        // let color = student.verification_status == 1 ? "green" : "red";
+                success: function(response) {
+                    // console.log(response.total_rows);
+                    // console.log(response.questions);
+                    console.log(response.page)
+                    buttonCount = Math.ceil(response.total_rows / response.limit);
+                    btnText = 1
+                    htmlText = '';
+                    while(buttonCount)
+                    {
+                        if(btnText == response.page)
+                            htmlText+=`<button class="page-btn" style="background:darkgreen" id="page-btn-${btnText}">${btnText}</button>`;
+                        else
+                            htmlText+=`<button class="page-btn" id="page-btn-${btnText}">${btnText}</button>`;
 
-                        // let button = "";
+                        btnText++;
+                        buttonCount--;
+                    }
 
-                        // if (question.verification_status == 0) {
-                        editButton = `<button class="edit-btn fa fa-edit" data-id="${question.question_id}" 
-                                    style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                                    &nbsp;Edit</button>`;
-
-                        deleteButton = `<button class="delete-btn fa fa-trash" data-id="${question.question_id}" style="background-color:red;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                        &nbsp;Delete</button>`;
-
-                        // } else {
-                        //     button = `<span style="color:gray;">Verified</span>`;
-                        // }
-
-                        rows += `
-                            <tr>
-                                <td>${question.question_id}</td>
-                                <td>${question.subject_name}</td>
-                                <td>${escapeHTML(question.question)}</td>
-                                <td>${escapeHTML(question.option_a)}</td>
-                                <td>${escapeHTML(question.option_b)}</td>
-                                <td>${escapeHTML(question.option_c)}</td>
-                                <td>${escapeHTML(question.option_d)}</td>
-                                <td>${escapeHTML(question.correct_answer)}</td>
-                                <td>${editButton} ${deleteButton}</td>
-                            </tr>
-                        `;
-                    });
-                    $("#questions-tbody").html(rows);
-
-                    var rowCount = $('#questions-tbody tr:visible').length;
-                    $("#entry-count").html("Total Entries : "+rowCount);
-                    console.log(rowCount);
+                    $("#pagination").html(htmlText);
+                    setResponseInTable(response.questions);
+                    
                 },
                 error: function(xhr, status, error) {
                     console.error("Error: " + error);
@@ -293,7 +297,6 @@
             
         
         });
-
 
 
         // delete button click
@@ -323,8 +326,77 @@
 
 
 
+        // page-btn-click
+        $(document).on("click", ".page-btn", function() {
+            const page = $(this).text();
+            console.log(page)
+
+            $.ajax({
+                    url: "fetch_questions.php",
+                    method: "POST",
+                    dataType:"json",
+                    data: { pageText: page },
+                    success: function(response) {
+                        $(".page-btn").css("background","#3b5eb8ff");
+                        $(`#page-btn-${page}`).css("background","darkgreen");
+                        console.log(response.questions);
+
+                        setResponseInTable(response.questions);
+                    },
+                    error: function() {
+                        alert("AJAX request failed.");
+                    }
+                });
+            // Redirect to edit question page with question ID as a query parameter
+            // window.open(`edit_question.php?question_id=${questionId}`, '_blank');
+            
+        
+        });
 
 
+        function setResponseInTable(data)
+        {
+            console.log(data);
+            
+            let rows = "";
+            $.each(data, function(index, question) {
+                // let verified = student.verification_status == 1 ? "Yes" : "No";
+                // let color = student.verification_status == 1 ? "green" : "red";
+
+                // let button = "";
+
+                // if (question.verification_status == 0) {
+                editButton = `<button class="edit-btn fa fa-edit" data-id="${question.question_id}" 
+                            style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
+                            &nbsp;Edit</button>`;
+
+                deleteButton = `<button class="delete-btn fa fa-trash" data-id="${question.question_id}" style="background-color:red;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
+                &nbsp;Delete</button>`;
+
+                // } else {
+                //     button = `<span style="color:gray;">Verified</span>`;
+                // }
+
+                rows += `
+                    <tr>
+                        <td>${question.question_id}</td>
+                        <td>${question.subject_name}</td>
+                        <td>${escapeHTML(question.question)}</td>
+                        <td>${escapeHTML(question.option_a)}</td>
+                        <td>${escapeHTML(question.option_b)}</td>
+                        <td>${escapeHTML(question.option_c)}</td>
+                        <td>${escapeHTML(question.option_d)}</td>
+                        <td>${escapeHTML(question.correct_answer)}</td>
+                        <td>${editButton} ${deleteButton}</td>
+                    </tr>
+                `;
+            });
+            $("#questions-tbody").html(rows);
+
+            var rowCount = $('#questions-tbody tr:visible').length;
+            $("#entry-count").html("Total Entries : "+rowCount);
+            // console.log(rowCount);
+        }
 
 
 

@@ -154,7 +154,7 @@ if ($_SESSION['user_email_id'] == $admin_email) {
                 align-items: center;
                 gap: 15px;
                 padding-bottom: 50px;
-        }
+            }
     }
     </style>
 </head>
@@ -188,7 +188,7 @@ if ($_SESSION['user_email_id'] == $admin_email) {
                 <span>Mock Tests</span>
             </a>
 
-            <a href="exam.php" class="button-link">
+            <a href="exam_instructions.php" class="button-link">
                 <i class="fa fa-trophy"></i>
                 <span>Attempt Exam</span>
             </a>

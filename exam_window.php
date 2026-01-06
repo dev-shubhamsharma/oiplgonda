@@ -1,3 +1,54 @@
+<!-- 
+ 
+Disable right click
+use Full screen mode
+tab swicthing detection
+disable shortcut keys
+disable selection of text
+
+on exit of fullscreen pause the exam and show warning
+
+
+-->
+
+
+
+<!-- Load subject name and total questions from settings table in database -->
+
+
+<?php 
+    
+    include "connection.php";
+    session_start();
+
+    $query = "select * from website_settings_table where setting_name IN (?,?)";
+    $stmt = $conn->prepare($query);
+
+    $exam_subject_name = "Exam subject name";
+    $exam_questions_limit = "Exam questions limit";
+
+    $stmt->bind_param('ss',$exam_subject_name,$exam_questions_limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if($result->num_rows > 0 )
+    {   
+        
+
+        while($row = $result->fetch_assoc())
+        {
+            echo $row['setting_value'];
+        }
+
+        
+    }
+
+
+?>
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
