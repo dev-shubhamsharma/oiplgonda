@@ -185,13 +185,34 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
                 <i class="fa fa-envelope"></i>
                 <span>View Enquiries</span>
             </a>
+
+            <a href="show_mocktest_ranking.php" class="button-link">
+                <i class="fa fa-bar-chart"></i>
+                <span>Show Mocktest Rank</span>
+            </a>
+
+            <a href="show_exam_reports.php" class="button-link">
+                <i class="fa fa-file-text"></i>
+                <span>Show Exam Reports</span>
+            </a>
+
+        </section>
+
+        <section class="buttons-container">
+
             <a href="manage_questions.php" class="button-link">
                 <i class="fa fa-question-circle"></i>
                 <span>Manage Questions</span>
             </a>
-            <a href="show_mocktest_ranking.php" class="button-link">
-                <i class="fa fa-bar-chart"></i>
-                <span>Show Mocktest Rank</span>
+            
+            <a href="add_subject.php" class="button-link">
+                <i class="fa fa-plus-circle"></i>
+                <span>Add New Subject</span>
+            </a>
+
+            <a href="website_settings.php" class="button-link">
+                <i class="fa fa-cogs"></i>
+                <span>Website Settings</span>
             </a>
             
         </section>

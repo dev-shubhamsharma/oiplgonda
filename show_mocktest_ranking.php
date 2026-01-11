@@ -237,7 +237,7 @@
                         } 
                         else 
                         {
-                            echo "<tr style='font-weight: bold; background-color: #3392beff;'>
+                            echo "<tr style='font-weight: bold; background-color: whitesmoke;'>
                                 <td>$count</td>
                                 <td><img src=\"images/user.png\" width=\"50\" height=\"50\" class=\"profile-image\"></td>
                                 <td>".$row['user_name']."</td>

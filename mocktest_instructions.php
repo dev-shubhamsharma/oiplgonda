@@ -45,8 +45,14 @@ $count_result = $count_stmt->get_result();
 if ($count_result->num_rows > 0) {
     $row = $count_result->fetch_assoc();
     if($row['total_questions'] > 10) {
-        // max questions in mocktest
-        $total_questions = 10;
+        
+        // fetch limit from website settings table
+        $settings_query = "SELECT setting_value FROM website_settings_table WHERE setting_key = 'mocktest_questions_limit'";
+        $settings_result = $conn->query($settings_query);
+        $settings_row = $settings_result->fetch_assoc();
+        $total_questions = (int)$settings_row['setting_value'];
+
+
     }
     else {
         $total_questions = $row['total_questions'];

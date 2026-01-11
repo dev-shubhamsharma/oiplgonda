@@ -1,4 +1,88 @@
 
+<?php
+
+    session_start();
+
+
+
+
+    if(!isset($_SESSION["user_id"]) or $_SESSION["user_id"] == "")
+    {
+        header("location:login.php");
+        exit();
+    }
+
+
+
+
+// Fetch exam subject and total Question from database setting
+    
+    include "connection.php";
+    
+
+    $sql = "
+    SELECT setting_key, setting_value
+    FROM website_settings_table
+    WHERE setting_key IN ('exam_subject_name', 'exam_questions_limit')
+    ";
+
+    $result = $conn->query($sql);
+
+    $settings = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $settings[$row['setting_key']] = $row['setting_value'];
+    }
+
+    $examSubject = $settings['exam_subject_name'];
+    $questionLimit = (int)$settings['exam_questions_limit'];
+    
+
+
+    if($examSubject == "" || $questionLimit == 0){
+        die("<h1>Exam Questions not found</h1>");
+        exit();
+    }
+
+    $exam_duration = $questionLimit * 0.5;
+
+
+    if($examSubject == "IT Tools")
+        $exam_subject_name = "IT Tools and Networking";
+    else if($examSubject == "Web Design")
+        $exam_subject_name = "Web Designing and Publishing";
+    else if($examSubject == "Python")
+        $exam_subject_name = "Python Programming";
+    else if($examSubject == "IoT")
+        $exam_subject_name = "Internet of Things (IOT)";
+    else
+        $exam_subject_name = "Invalid Subject name";
+
+
+    $exam_total_questions = $questionLimit;
+
+    $_SESSION["exam_subject_name"] = $examSubject;
+    $_SESSION["exam_questions_limit"] = $questionLimit;
+    $_SESSION["exam_subject_title"] = $exam_subject_name;
+    $_SESSION["exam_duration"] = $exam_duration;
+
+
+
+
+    // echo $exam_subject_name;
+    // echo $exam_total_questions;
+
+
+
+
+
+
+    
+
+
+
+?>
+
 
 
 
@@ -99,8 +183,9 @@
     <div class="container">
         <h3>Exam Details:</h3>
         <ul>
-            <li><strong>Total Duration:</strong> 60 Minutes</li>
-            <li><strong>Total Questions:</strong> 100 MCQs</li>
+            <li><strong>Subject Name:</strong> <?php echo $exam_subject_name; ?> </li>
+            <li><strong>Total Questions:</strong> <?php echo $exam_total_questions; ?> MCQs</li>
+            <li><strong>Total Duration:</strong> <?php echo $exam_duration; ?> Minutes</li>
             <li><strong>Marking Scheme:</strong> +1 for correct, 0 for unattempted, 0 for wrong.</li>
         </ul>
 
