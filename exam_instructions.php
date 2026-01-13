@@ -4,6 +4,17 @@
     session_start();
 
 
+    // for only desktop access to the exam page
+    $mobile = preg_match(
+        '/(android|iphone|ipad|ipod|blackberry|windows phone)/i',
+        $_SERVER['HTTP_USER_AGENT']
+    );
+
+    if ($mobile) {
+        die("<h1>This website is not available on mobile devices.</h1>");
+    }
+        
+
 
 
     if(!isset($_SESSION["user_id"]) or $_SESSION["user_id"] == "")

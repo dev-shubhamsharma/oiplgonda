@@ -17,6 +17,19 @@ on exit of fullscreen pause the exam and show warning
 
 session_start();
 
+// for only desktop access to the exam page
+$mobile = preg_match(
+    '/(android|iphone|ipad|ipod|blackberry|windows phone)/i',
+    $_SERVER['HTTP_USER_AGENT']
+);
+
+if ($mobile) {
+    die("<h1>This website is not available on mobile devices.</h1>");
+}
+
+
+
+
 $user_id = $_SESSION["user_id"];
 $user_name = $_SESSION["user_name"];
 
@@ -740,8 +753,7 @@ if(!isset($_SESSION["exam_remaining_time"])) {
                         }
                         
 
-                        // hide overlay when questions loaded and all set
-                        $("#overlay").hide();
+                        
 
                     },
                     error:function(xhr,status,error){
@@ -822,6 +834,9 @@ if(!isset($_SESSION["exam_remaining_time"])) {
                         $("input[name='question']").prop("checked", false);
                         if(response.selected_answer !== null) {
                             $("input[value='"+response.selected_answer+"']").prop("checked", true);
+                            
+                            // hide overlay when questions loaded and all set
+                            $("#overlay").hide();
                         }
                     },
                     error:function(xhr,status,error){
