@@ -131,7 +131,7 @@
         } */
 
         td:nth-child(9) {
-            width: 15%;
+            width: 20%;
         }
 
 
@@ -367,11 +367,9 @@
 
                 // if (question.verification_status == 0) {
                 editButton = `<button class="edit-btn fa fa-edit" data-id="${question.question_id}" 
-                            style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                            &nbsp;Edit</button>`;
+                            style="background-color:green;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;"></button>`;
 
-                deleteButton = `<button class="delete-btn fa fa-trash" data-id="${question.question_id}" style="background-color:red;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;">
-                &nbsp;Delete</button>`;
+                deleteButton = `<button class="delete-btn fa fa-trash" data-id="${question.question_id}" style="background-color:red;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;"></button>`;
 
                 // } else {
                 //     button = `<span style="color:gray;">Verified</span>`;

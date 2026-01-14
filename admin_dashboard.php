@@ -205,10 +205,10 @@ if ($_SESSION['user_email_id'] !== $admin_email) {
                 <span>Manage Questions</span>
             </a>
             
-            <a href="add_subject.php" class="button-link">
+            <!-- <a href="add_subject.php" class="button-link">
                 <i class="fa fa-plus-circle"></i>
                 <span>Add New Subject</span>
-            </a>
+            </a> -->
 
             <a href="website_settings.php" class="button-link">
                 <i class="fa fa-cogs"></i>

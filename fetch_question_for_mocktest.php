@@ -23,7 +23,6 @@ if ($result->num_rows > 0) {
 
     $row["question_number"] = ($_SESSION["current_question_index"]+1);
 
-
     echo json_encode($row);
 } else {
     echo json_encode(array("error" => "No question found"));

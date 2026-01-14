@@ -10,7 +10,7 @@ $pageText = isset($_POST['pageText']) ? (int)$_POST['pageText'] : 1;
 $pageText = max(1, $pageText);
 
 
-$limit = 50;
+$limit = 100;
 $offset = ($pageText - 1) * $limit;
 
 
