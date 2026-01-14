@@ -386,8 +386,20 @@ if ($result->num_rows > 0) {
             $(".delete-btn").click(function(){
                 var userId = $(this).data("user-id");
                 if (confirm("Are you sure you want to delete the report for User ID: " + userId + "?")) {
-                    alert("Report deleted for User ID: " + userId);
                     // Implement AJAX call to delete the report
+                    $.ajax({
+                        url: 'delete_exam_answers.php',
+                        type: 'POST',
+                        data: { user_id: userId },
+                        success: function(response) {
+                            alert("Report deleted successfully.");
+                            location.reload(); // Refresh the page to update the report list
+                        },
+                        error: function() {
+                            alert("An error occurred while deleting the report.");
+                        }
+                    });
+                    
                 }
             });
 
@@ -439,6 +451,40 @@ if ($result->num_rows > 0) {
                 // open in new tab
                 window.open("detailed_exam_report.php?user_id=" + userId+"&total="+total_questions+"&correct="+correct_answers+"&wrong="+wrong_answers+"&unattempt="+unattempted_questions, "_blank");
                 
+            });
+
+
+            $("#search-box").on("input", function(){
+                var searchTerm = $(this).val().toLowerCase();
+                $("#table-body tr").each(function(){
+                    var studentName = $(this).find("td:nth-child(2)").text().toLowerCase();
+                    var studentId = $(this).find("td:nth-child(1)").text().toLowerCase();
+                    if (studentName.includes(searchTerm) || studentId.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+
+            $("#download-btn").click(function(){
+                
+                var csv = 'Student ID,Student Name,Total Questions,Attempted,Date\n';
+                $(".report-table tbody tr:visible").each(function() {
+                    var row = [];
+                    $(this).find('td').each(function() {
+                        row.push($(this).text().trim());
+                    });
+                    csv += row.join(',') + '\n';
+                });
+                // download the csv file
+                var hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                hiddenElement.target = '_blank';
+                hiddenElement.download = 'exam_reports.csv';
+                hiddenElement.click();
+
             });
 
 

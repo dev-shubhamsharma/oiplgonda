@@ -11,7 +11,7 @@
     );
 
     if ($mobile) {
-        die("<h1>This website is not available on mobile devices.</h1>");
+        die("<h1>This page is not available on mobile devices.</h1>");
     }
         
 
