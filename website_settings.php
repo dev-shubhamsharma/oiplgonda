@@ -15,6 +15,10 @@
         }
     }
 
+   
+
+    
+
 ?>
 
 <!DOCTYPE html>
@@ -102,6 +106,14 @@
             border-radius: 5px;
         }
 
+        select.input-box {
+            width: 90%;
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
         tr {
             border-bottom: 1px solid #ccc;
         }
@@ -180,7 +192,14 @@
                     <label for="exam-subject-name">Exam Subject Name</label>
                 </td>
                 <td>
-                    <input type="text" class="input-box" id="exam-subject-name" name="exam-subject-name" value="<?php echo $settings["exam_subject_name"]; ?>">
+                    <!-- drop down btn for subject -->
+                    <select name="exam-subject-name" id="exam-subject-name" class="input-box">
+                        
+                    </select>
+                    <!-- 
+                    <input type="text" class="input-box" id="exam-subject-name" name="exam-subject-name" value="<?php //echo $settings["exam_subject_name"]; ?>">
+
+                    -->
                 </td>
             </tr>
 
@@ -221,6 +240,44 @@
                             alert("An error occurred while saving settings.");
                         }
                     });
+
+                });
+
+
+                // Load Subjects name from table
+
+                $.ajax({
+                    url: 'load_subjects_name.php',
+                    type : 'POST',
+                    dataType : 'json',
+                    success: function(response) {
+                        
+                        // console.log(response);
+                        // console.log(JSON.stringify(response));
+
+                        // console.log(response.length);
+                        let subjectNameBox = $("#exam-subject-name");
+                        subjectNameBox.html("");
+
+                        res = "Select";
+                        for (let index = 0; index < response.length; index++) {
+                            const element = response[index];
+
+                            res += "<option>"+element["subject_name"]+"</option>";
+
+                            // console.log();
+                            
+                        }
+
+                        subjectNameBox.html(res);
+
+                        selectedSubject = "<?php echo $settings['exam_subject_name']; ?>";
+                        subjectNameBox.val(selectedSubject);
+                        
+                    },
+                    error : function() {
+                        alert("An error occured during fetching subject names");
+                    }
 
                 });
 

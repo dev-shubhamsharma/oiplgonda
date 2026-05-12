@@ -1,8 +1,10 @@
 <?php 
 
+
     session_start();
 
     include "connection.php";
+
 
 
     $query = "select COUNT(user_id) as user_attempt, user_name, subject_name, MAX(total_questions) as total_questions, 
@@ -15,10 +17,8 @@
     if($result->num_rows == 0)
         die("No Data Found to Display");
 
-
     
-
-
+    include "libs/jquery.php";
 
 
 ?>
@@ -184,12 +184,13 @@
     <div id="button-section">
         <div class="box">
             <label for="rank-type">Ranking Subject : </label>
-            <select name="rank-type" id="rank-type">
-                <option value="all">All</option>
+            <select name="rank-type" id="rank-type" >
+
+                <!-- <option value="all">All</option>
                 <option value="IT Tools">IT Tools</option>
                 <option value="Web Design">Web Design</option>
                 <option value="Python">Python</option>
-                <option value="IoT">IoT</option>
+                <option value="IoT">IoT</option> -->
             </select>
         </div>
         
@@ -270,6 +271,50 @@
         
     </main>
 
+
+    <script>
+        $(document).ready(function(){
+
+                // Load Subjects name from table
+
+                $.ajax({
+                    url: 'load_subjects_name.php',
+                    type : 'POST',
+                    dataType : 'json',
+                    success: function(response) {
+                        
+                        // console.log(response);
+                        // console.log(JSON.stringify(response));
+
+                        // console.log(response.length);
+                        let subjectNameBox = $("#rank-type");
+                        subjectNameBox.html("");
+
+                        res = "Select";
+                        for (let index = 0; index < response.length; index++) {
+                            const element = response[index];
+
+                            res += "<option>"+element["subject_name"]+"</option>";
+
+                            // console.log();
+                            
+                        }
+
+                        subjectNameBox.html(res);
+
+                        
+                    },
+                    error : function() {
+                        alert("An error occured during fetching subject names");
+                    }
+
+                });
+
+
+        });
+
+
+    </script>
 
 
 

@@ -194,8 +194,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 
         <a href="mocktest_instructions.php?testname=iot" class="button-link">
-            <i class="fa fa-microchip"></i>
+            <i class="fa fa-wifi"></i>
             <span>Internet of Things</span>
+        </a>
+
+        <a href="mocktest_instructions.php?testname=oops" class="button-link">
+            <i class="fa fa-cube"></i>
+            <span>OOPs</span>
         </a>
 
     </section>

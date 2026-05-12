@@ -25,6 +25,8 @@ else if($testname == "python")
     $subject_name = "Python";
 else if($testname == "iot")
     $subject_name = "IoT";
+else if($testname == "oops")
+    $subject_name = "OOPs";
 else {
     die("Invalid testname provided.");   // stops page and prevents SQL error
 }

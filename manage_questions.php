@@ -343,7 +343,10 @@
 
                         setResponseInTable(response.questions);
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText);
+                        console.log(status);
+                        console.error("Error: " + error);
                         alert("AJAX request failed.");
                     }
                 });

@@ -13,15 +13,20 @@ $pageText = max(1, $pageText);
 $limit = 100;
 $offset = ($pageText - 1) * $limit;
 
-
+$limit = (int)$limit;
+$offset = (int)$offset;
 
 $sql = "SELECT question_id, subject_name, question, option_a, option_b, option_c, option_d, correct_answer
-        FROM questions_table 
+        FROM questions_table  
         order by question_id ASC
         LIMIT $limit offset $offset";
 
 $result = $conn->query($sql);
+
+
 $questions = [];
+
+
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $questions[] = $row;

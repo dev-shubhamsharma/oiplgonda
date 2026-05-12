@@ -191,11 +191,13 @@
             <div style="margin-bottom: 20px;">
                 <label for="subject-name">Subject Name :</label><br>
                 <select id="subject-name" name="subject_name" style="width: 100%; padding: 10px;" required>
-                    <option value="Select">Select</option>
+
+
+                    <!-- <option value="Select">Select</option>
                     <option value="IT Tools">IT Tools</option>
                     <option value="Python">Python</option>
                     <option value="Web Design">Web Design</option>
-                    <option value="IoT">IoT</option>
+                    <option value="IoT">IoT</option> -->
                 </select>
             </div>
 
@@ -282,6 +284,46 @@
 
 
         $(document).ready(function() {
+
+            // Load Subjects name from table
+
+            $.ajax({
+                url: 'load_subjects_name.php',
+                type : 'POST',
+                dataType : 'json',
+                success: function(response) {
+                    
+                    // console.log(response);
+                    // console.log(JSON.stringify(response));
+
+                    // console.log(response.length);
+                    let subjectNameBox = $("#subject-name");
+                    subjectNameBox.html("");
+
+                    res = "Select";
+                    for (let index = 0; index < response.length; index++) {
+                        const element = response[index];
+
+                        res += "<option>"+element["subject_name"]+"</option>";
+
+                        // console.log();
+                        
+                    }
+
+                    subjectNameBox.html(res);
+
+                    
+                },
+                error : function() {
+                    alert("An error occured during fetching subject names");
+                }
+
+            });
+
+
+
+
+
             
 
             // Fetch question_id from URL
